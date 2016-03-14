@@ -149,33 +149,53 @@ function achieve { #inte
 function usage {
   echo "
    usage: sd <command> | sd --help
-   init | remove                      :before integrity check
+   init | remove                        :before integrity check
      init-initialize, remove-terminate
 
-   ve | co | te | st [all] | diff [n] :with source of a version
+   ve | co | te | st [all] | df [n|all] :with source of a version
      ve-version, co-compile
      te-test with IO files, hide compile warning messages
      st-show status of all version, or
         current source compared with latest
+     df-diff the all sources through the history, or
+        diff current source with n'th source, or
+        diff current source with latest source
 
-   ne | re | cp [<n>]                 :with versions of source
+   ne | re | cp [<n>]                   :with versions of source
      ne-to next version, re-return to latest version
      cp <n>-copy source of n'th version, or the latest if not specified
 
-   new | view | go <name>             :with various achieves
+   new | view | go <name>               :with various achieves
      new-start new achieve, interactively query name for saving archieve
      view-view all saved achieves
      go-go to another achieve of given name, current version must be 1
 
-   stdin [file] | stdout [file]       :only at the start of new archieve
+   stdin [file] | stdout [file]         :only at the start of new archieve
      set the i/oput file .. named as 'file'
      must be called at ver. 1
      if file name not specified, opens vim to edit them automatically
 
-   --help                             :when you don't know what to do
+   --help                               :when you don't know what to do
      --help-print this manual
 
      "
+}
+
+function catcode {
+  if [ -z "$1" ]; then
+    echo ERROR! \'catcode\' must be called with version number parameter
+  else
+    if [ $NVER -eq $1 ]; then
+      fname=$PROG.c
+    else
+      fname=$SUBDIR/$1.c
+    fi
+
+    cat $fname
+    lines=$(echolines $fname) #inte
+    bytes=$(echobytes $fname) #inte
+    echo $lines lines, $bytes bytes
+  fi
 }
 
 #if [ -z "$1" ]; then #check if $1 is null string
@@ -243,6 +263,71 @@ elif [ "st" == "$1" ]; then
     done
   else
     echo use apropriate command
+  fi
+
+elif [ "df" == "$1" ]; then
+  if [ -z "$2" ]; then
+    echo diff ver. $[NVER-1] / $NVER\(current\)
+    sdiff $SUBDIR/$[NVER-1].c $PROG.c
+    l1=$(echolines $SUBDIR/$[NVER-1].c) #inte
+    b1=$(echobytes $SUBDIR/$[NVER-1].c) #inte
+    l2=$(echolines $PROG.c) #inte
+    b2=$(echobytes $PROG.c) #inte
+    echo $l2\($[l2-l1]\) lines, $b2\($[b2-b1]\) bytes
+
+  elif [[ $2 =~ $REXNUM ]]; then
+    if [ $2 -ge $NVER ]; then
+      echo specified version number must be smaller than current
+    else
+      echo diff ver. $2 / $NVER\(currnet\)
+      sdiff $SUBDIR/$2.c $PROG.c
+      l1=$(echolines $SUBDIR/$2.c) #inte
+      b1=$(echobytes $SUBDIR/$2.c) #inte
+      l2=$(echolines $PROG.c) #inte
+      b2=$(echobytes $PROG.c) #inte
+      echo $l2\($[l2-l1]\) lines, $b2\($[b2-b1]\) bytes
+    fi
+  elif [ "all" == "$2" ]; then
+    loopvar=1
+    i=1;
+    ans="n"
+    while [ 1 == $loopvar ]
+    do
+      clear
+      echo version $i
+      catcode $i
+      printf "[n/p] "
+      read ff
+      if [ -z "$ff" ]; then
+        if [ "$ans" == "n" ]; then
+          i=$[i+1]
+          if [ $i -gt $NVER ]; then
+            break
+          fi
+        elif [ "$ans" == "p" ]; then
+          i=$[i-1]
+          if [ $i -lt 1 ]; then
+            i=1
+          fi
+        fi
+      elif [ "$ff" == "n" ]; then
+        i=$[i+1]
+        if [ $i -gt $NVER ]; then
+          break
+        fi
+        ans=$ff
+      elif [ "$ff" == "p" ]; then
+        i=$[i-1]
+        if [ $i -lt 1 ]; then
+          i=1
+        fi
+        ans=$ff
+      elif [ "$ff" == "q" ]; then
+        break
+      else
+        printf "parden me? [n/p] "
+      fi
+    done
   fi
 
 #set to next version
