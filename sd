@@ -149,29 +149,30 @@ function achieve { #inte
 function usage {
   echo "
    usage: sd <command> | sd --help
-   init | remove                   :before integrity check
+   init | remove                      :before integrity check
      init-initialize, remove-terminate
 
-   ve | co | te | st               :with source of a version
+   ve | co | te | st [all] | diff [n] :with source of a version
      ve-version, co-compile
      te-test with IO files, hide compile warning messages
-     st-show status of current source compared with latest
+     st-show status of all version, or
+        current source compared with latest
 
-   ne | re | cp [<n>]              :with versions of source
+   ne | re | cp [<n>]                 :with versions of source
      ne-to next version, re-return to latest version
      cp <n>-copy source of n'th version, or the latest if not specified
 
-   new | view | go <name>          :with various achieves
+   new | view | go <name>             :with various achieves
      new-start new achieve, interactively query name for saving archieve
      view-view all saved achieves
      go-go to another achieve of given name, current version must be 1
 
-   stdin [file] | stdout [file]    :only at the start of new archieve
+   stdin [file] | stdout [file]       :only at the start of new archieve
      set the i/oput file .. named as 'file'
      must be called at ver. 1
      if file name not specified, opens vim to edit them automatically
 
-   --help                          :when you don't know what to do
+   --help                             :when you don't know what to do
      --help-print this manual
 
      "
@@ -220,15 +221,28 @@ elif [ "te" == "$1" ]; then
 
 #state of current code
 elif [ "st" == "$1" ]; then
-  lines=$(echolines $PROG.c) #inte
-  bytes=$(echobytes $PROG.c) #inte
-  if [ 1 != $NVER ]; then #inte
-    LPROG=$SUBDIR/$[NVER-1] #inte
-    llines=$(echolines $LPROG.c) #inte
-    lbytes=$(echobytes $LPROG.c) #inte
-    echo current source is $bytes\($[bytes-lbytes]\) bytes, in $lines\($[lines-llines]\) lines
+  if [ -z "$2" ]; then
+    lines=$(echolines $PROG.c) #inte
+    bytes=$(echobytes $PROG.c) #inte
+    if [ 1 != $NVER ]; then #inte
+      LPROG=$SUBDIR/$[NVER-1] #inte
+      llines=$(echolines $LPROG.c) #inte
+      lbytes=$(echobytes $LPROG.c) #inte
+      echo current source is $bytes\($[bytes-lbytes]\) bytes, in $lines\($[lines-llines]\) lines
+    else
+      echo current source is $bytes bytes, in $lines lines
+    fi
+  elif [ "all" == "$2" ]; then
+    printf "%5s %10s %10s\n" "VER." "lines" "bytes"
+    echo "============================="
+    for i in `seq 1 $[NVER-1]`
+    do
+      lines=$(echolines $SUBDIR/$i.c) #inte
+      bytes=$(echobytes $SUBDIR/$i.c) #inte
+      printf " %03d  %10s %10s\n" $i "$lines" "$bytes"
+    done
   else
-    echo current source is $bytes bytes, in $lines lines
+    echo use apropriate command
   fi
 
 #set to next version
