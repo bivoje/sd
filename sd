@@ -45,13 +45,10 @@ function viewachieves { #inte
 function compile { #inte
   if [ -z "$1" ]; then
     echo gcc $PROG.c -o $PROG -O2 -Wall -lm --static -std=c99 -DONLINE_JUDGE
-  fi
-
-  gcc $PROG.c -o $PROG -O2 -Wall -lm --static -std=c99 -DONLINE_JUDGE
-  compresult=$?
-
-  if ! [ -z "$1" ]; then
-    echo $compresult
+    gcc $PROG.c -o $PROG -O2 -Wall -lm --static -std=c99 -DONLINE_JUDGE
+  else
+    gcc $PROG.c -o $PROG -O2 -Wall -lm --static -std=c99 -DONLINE_JUDGE 2>/dev/null
+    echo $?
   fi
 }
 
@@ -156,7 +153,8 @@ function usage {
   echo "  init-initialize, remove-terminate"
   echo ' '
   echo "ve | co | te | st               :with source of a version"
-  echo "  ve-version, co-compile, te-test with IO files"
+  echo "  ve-version, co-compile"
+  echo "  te-test with IO files, hide compile warning messages"
   echo "  st-show status of current source compared with latest"
   echo ' '
   echo "ne | re | cp [<n>]              :with versions of source"
