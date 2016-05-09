@@ -25,6 +25,7 @@ SUBDIR=.shortc
 INPUT=$SUBDIR/.input
 OUTPUT=$SUBDIR/.output
 VERFIL=$SUBDIR/.version
+TAGFIL=$SUBDIR/.tag
 NVER=0
 
 #REQUIR: file($1) exist
@@ -56,20 +57,17 @@ function compile { #inte
 function cntest { #inte
   touch .tmpout # in case the prog's output is null
   cat $INPUT | ./$PROG > .tmpout
-  diffs=$(sdiff $OUTPUT .tmpout)
-  diffresult=$?
-  if ! [ -z "$1" ]; then
-    echo $diffresult
+  if [ ! -z "$1" ]; then
+    sdiff $OUTPUT .tmpout > /dev/null
+    echo $?
   else
     echo ' '
+    sdiff $OUTPUT .tmpout
+    diffresult=$?
     if [ 1 == $diffresult ]; then
       echo \<\<\<FAILED!!
-      echo $diffs
-      CNTEST=0
     elif [ 0 == $diffresult ]; then
       echo \>\>\>SUCCESS!
-      cat .tmpout
-      CNTEST=1
     fi
     echo ' '
   fi
@@ -152,14 +150,19 @@ function usage {
    init | remove                        :before integrity check
      init-initialize, remove-terminate
 
-   ve | co | te | st [all] | df [n|all] :with source of a version
+   ve | co | te                         :with source of a version
      ve-version, co-compile
+     co-compile with options -- standard for the icpc
      te-test with IO files, hide compile warning messages
+
+   st [all] | df [n|all] | tg [view] | export
      st-show status of all version, or
         current source compared with latest
      df-diff the all sources through the history, or
         diff current source with n'th source, or
         diff current source with latest source
+     tg-
+     export-open gedit so that you can copy then easily
 
    ne | re | cp [<n>]                   :with versions of source
      ne-to next version, re-return to latest version
@@ -233,7 +236,7 @@ elif [ "co" == "$1" ]; then
 
 #test the code
 elif [ "te" == "$1" ]; then
-  if [ 1 == $(compile "quit") ]; then
+  if [ 1 == $(compile "quiet") ]; then
     echo compile error!
   else
     cntest
@@ -265,6 +268,7 @@ elif [ "st" == "$1" ]; then
     echo use apropriate command
   fi
 
+#view diff of sources
 elif [ "df" == "$1" ]; then
   if [ -z "$2" ]; then
     echo diff ver. $[NVER-1] / $NVER\(current\)
@@ -329,6 +333,12 @@ elif [ "df" == "$1" ]; then
       fi
     done
   fi
+
+#tag
+
+#help exporting to clipboard
+elif [ "export" == "$1" ]; then
+  gedit $PROG.c
 
 #set to next version
 elif [ "ne" == "$1" ]; then
@@ -432,7 +442,7 @@ elif [ "go" == "$1" ]; then
     #reset $NVER //it's alreay on version 1
     mv $SUBDIR/$2/* $SUBDIR/$2/.* $SUBDIR
     NVER=$(cat $VERFIL)
-    mv $SUBDIR/$[NVER-1].c $PROG.c # achieves are always version over 1
+    cp $SUBDIR/$[NVER-1].c $PROG.c # achieves are always version over 1
     echo achieve \"$2\", coping ver. $[NVER-1]
   fi
 
