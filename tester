@@ -1,0 +1,155 @@
+#!/bin/bash
+
+# this is a tester module for sd
+
+# conventions
+# get..    name denotes functions which
+#          put value to stdout
+# set..    name denotes functions which 
+#          set the global variable
+# argn     function - which actually alias -
+#          checks proper number of argument was given
+# assert   same as ASSERT macro in C language
+#          mute on un-debuging not supported
+
+# exporting variables
+# { SOURCENAME
+# , EXECNAME
+# , CMPLNEED
+# }
+
+shopt -s expand_aliases
+alias argn='_argn $0 $LINENO $#'
+alias assert='_assert $0 $LINENO'
+
+function _argn {
+  if [ $# != 4 ]; then
+    echo ARGNERROR! on $2 th line of \"$1\"
+    if [ $# == 3 ]; then
+      echo Too little arguments
+    else echo Too many arguments; fi
+    exit
+  elif [ $3 != $4 ]; then
+    echo ARGERROR! on $2 th line of \"$1\"
+    echo required $4 but given $3
+    exit
+  fi
+}
+
+function _assert {
+  if [ $# != 3 ]; then
+    echo ASSERTERROR! on $2 th line of \"$1\"
+    if [ $# == 2 ]; then
+      echo Too little arguments
+    else echo Too many arguments; fi
+    exit
+  elif [ `expr $3` ]; then
+    echo ASSERTION FAILED! on $2 th line of \"$1\"
+    echo of assertion \"$3\"
+    exit
+  fi
+}
+
+function getsrcmoddate {
+echo ""
+#TODO
+}
+
+function getexemoddate {
+echo ""
+#TODO
+}
+
+function uptsrcmoddate {
+echo ""
+#TODO
+}
+
+function upexemoddate {
+echo ""
+#TODO
+}
+
+function getextension {
+  argn 1
+
+  echo $1 | rev | cut -s -d '.' -f 1 | rev
+}
+
+function setsrcexename {
+  argn 0
+
+  # if variable already not set
+  SOURCENAME=${SOURCENAME:-main.c}
+  EXECNAME=${EXECNAME:-main}
+}
+
+function getcmplcmdfromext {
+  argn 1
+
+  local cmplcmd=
+  local ext=$1
+  local map=(
+    "c   gcc $SOURCENAME -o $EXECNAME"
+    "cpp gcc $SOURCENAME -o $EXECNAME"
+    "hs  ghc $SOURCENAME -o $EXECNAME"
+    "lhs ghc $SOURCENAME -o $EXECNAME"
+    ) 
+
+  for val in "${map[@]}"; do
+    if [ `echo $val | cut -s -d ' ' -f 1` == $ext ]; then
+      cmplcmd=`expr "$val" : "$ext[[:blank:]]\+\(.*\)"`
+      break
+    fi
+  done
+
+  echo $cmplcmd
+}
+
+function setcmplcmd { #src name
+  argn 0
+
+  local ext=`getextension $SOURCENAME`
+  local ncmplcmd=`getcmplcmdfromext $ext`
+  CMPLCMD=${CMPLCMD:-$ncmplcmd}
+}
+
+function setcmplneed { # src,exe name
+  argn 0
+
+  local srcmoddate=`stat $SOURCENAME -c %y`
+  local osrcmoddate=`getsrcmoddate`
+  local exemoddate=`stat $EXECNAME -c %y`
+  local oexemoddate=`getexemoddate`
+
+  if ! [ -e $EXECNAME ]; then
+    CMPLNEED=1
+  elif [ "$srcmoddate" != "$osrcmoddate" ]; then
+    CMPLNEED=2
+  # user might have compiled by him/herself
+  elif [ "$exemoddate" != "$oexemoddate" ]; then
+    CMPLNEED=3
+  else
+    CMPLNEED=0
+  fi
+}
+
+function compile {
+  argn 0
+
+  `CMPLCMD`
+  #TODO
+}
+
+function testing {
+echo ""
+#TODO
+}
+
+function autocompile {
+  setcmplneed
+  if [ $CMPLNEED != 0 ]; then
+    setcmplcmd
+    compile
+  fi
+}
