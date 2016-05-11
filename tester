@@ -161,10 +161,24 @@ echo ""
 #TODO
 }
 
-function autocompile {
+function autocompile { # src/exec name
+  argn 0
+
   setcmplneed
-  if [ $CMPLNEED != 0 ]; then
-    setcmplcmd
+  #CHECKME
+  if [ $CMPLNEED == 3 ]; then
+    echo you have executable compiled manually!
+    while true; do
+      read -p "would you compile it again with sd? \(y or n\)" ans
+      case $ans in
+        [Yy]* ) setcmplcmdi; compile; break;;
+        [Nn]* ) break;;
+        *     ) echo please answer y or n;;
+      esac
+    done
+
+  elif [ $CMPLNEED != 0 ]; then
+    setcmplcmdi
     compile
   fi
 }
