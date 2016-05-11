@@ -7,15 +7,22 @@
 #          put value to stdout
 # set..    name denotes functions which 
 #          set the global variable
+# set..i   name denotes functions which
+#          will set if variable not previously set
 # argn     function - which actually alias -
 #          checks proper number of argument was given
 # assert   same as ASSERT macro in C language
-#          mute on un-debuging not supported
+#          mute on un-debugging not supported
+#          use with string of statement to evaluate
 
 # exporting variables
 # { SOURCENAME
 # , EXECNAME
 # , CMPLNEED
+#     0 doesn't needed
+#     1 exec not exist
+#     2 src modified
+#     3 exec has created manually
 # }
 
 shopt -s expand_aliases
@@ -55,7 +62,7 @@ echo ""
 #TODO
 }
 
-function getexemoddate {
+function getexecmoddate {
 echo ""
 #TODO
 }
@@ -65,7 +72,7 @@ echo ""
 #TODO
 }
 
-function upexemoddate {
+function upexecmoddate {
 echo ""
 #TODO
 }
@@ -76,7 +83,7 @@ function getextension {
   echo $1 | rev | cut -s -d '.' -f 1 | rev
 }
 
-function setsrcexename {
+function setsrcexecnamei {
   argn 0
 
   # if variable already not set
@@ -106,7 +113,7 @@ function getcmplcmdfromext {
   echo $cmplcmd
 }
 
-function setcmplcmd { #src name
+function setcmplcmdi { #src name
   argn 0
 
   local ext=`getextension $SOURCENAME`
@@ -114,7 +121,7 @@ function setcmplcmd { #src name
   CMPLCMD=${CMPLCMD:-$ncmplcmd}
 }
 
-function setcmplneed { # src,exe name
+function setcmplneed { # src,exec name
   argn 0
 
   local srcmoddate=
