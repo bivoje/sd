@@ -18,11 +18,14 @@
 # exporting variables
 # { SOURCENAME
 # , EXECNAME
+# , TESTIONAME
 # , CMPLNEED
 #     0 doesn't needed
 #     1 exec not exist
 #     2 src modified
 #     3 exec has created manually
+# , TESTIS
+# , TESTOS
 # }
 
 shopt -s expand_aliases
@@ -146,6 +149,86 @@ function setcmplneed { # src,exec name
         CMPLNEED=0
       fi
     fi
+  fi
+}
+
+function settestios { # testioname
+  argn 0
+
+  local wheio=0 # parsing on input(-1), comment(0), output(1)
+  local wheiof=0 # explicit 0, successive 1
+  local lineno=0 # for error reporting
+  local readnum=0
+  local error=0
+  TESTIONUM=0
+  # erasing previouse variables
+  TESTIS[0]=
+  TESTOS[0]=
+
+  while read line; do
+    ((lineno++))
+    case $wheio in
+      0 ) # comment
+        if [[ "$line" =~ ^==+ ]]; then
+          wheio=-1
+          readnum=`expr "$line" : "^==\+\([[:digit:]]\+\)$"`
+          if [ -z $num ]; then readnum=0; fi
+        fi
+        ;;
+      -1 ) # input
+        if [ $readnum != 0 ]; then
+          TESTIS[$TESTIONUM]+="\n$line"
+          ((readnum--))
+        elif [[ "$line" =~ ^==+ ]]; then
+          # if what we read was known to be successive
+          # they were actually all comments
+          if [ $wheiof == 1 ]; then
+            # now it's explicit
+            wheiof=0
+            TESTIS[$TESTIONUM]=
+            wheio=-1
+            readnum=`expr "$line" : "^--\+\([[:digit:]]\+\)$"`
+            if [ -z $readnum ]; then readnum=0; fi
+          else # if what we read was explicit
+            # repeated =====
+            error=1
+          fi
+        elif [[ "$line" =~ ^--+ ]]; then
+          wheio=1
+          readnum=`expr "$line" : "^--\+\([[:digit:]]\+\)$"`
+          if [ -z $num ]; then readnum=0; fi
+        else
+          TESTIS[$TESTIONUM]+="\n$line"
+        fi
+          ;;
+      1 ) # output
+        if [ $readnum != 0 ]; then
+          TESTOS[$TESTIONUM]+="\n$line"
+          ((readnum--))
+        elif [[ "$line" =~ ^==+ ]]; then
+          ((TESTIONUM++))
+          # erasing previouse variables
+          TESTIS[$TESTIONUM]=
+          TESTOS[$TESTIONUM]=
+          wheio=-1
+          wheiof=1
+          readnum=`expr "$line" : "^==\+\([[:digit:]]\+\)$"`
+          if [ -z $readnum ]; then readnum=0; fi
+        else
+          TESTOS[$TESTIONUM]+="\n$line"
+        fi
+        ;;
+    esac
+    if [ $error != 0 ]; then break; fi
+  done < $TESTIONAME
+
+  #if [ $error != 0 ]; then false;
+  #  # wheio should be -1 (input) when it's end
+  # else [ $wheio != -1 ]; fi
+  if [ $error != 0 ] || [ $wheio != 0 ]; then
+    return $lineno
+  else
+    return 0
   fi
 }
 
