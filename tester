@@ -5,7 +5,7 @@
 # conventions
 # get..    name denotes functions which
 #          put value to stdout
-# set..    name denotes functions which 
+# set..    name denotes functions which
 #          set the global variable
 # set..i   name denotes functions which
 #          will set if variable not previously set
@@ -101,7 +101,7 @@ function getcmplcmdfromext {
     "cpp gcc $SOURCENAME -o $EXECNAME"
     "hs  ghc $SOURCENAME -o $EXECNAME"
     "lhs ghc $SOURCENAME -o $EXECNAME"
-    ) 
+    )
 
   for val in "${map[@]}"; do
     if [ `echo $val | cut -s -d ' ' -f 1` == $ext ]; then
@@ -149,11 +149,11 @@ function setcmplneed { # src,exec name
   fi
 }
 
-function compile {
+function compile { # cmplcmd
   argn 0
 
+  echo $CMPLCMD
   $CMPLCMD
-  #TODO
 }
 
 function testing {
