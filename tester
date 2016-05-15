@@ -214,6 +214,9 @@ function settestios { # testioname
           wheiof=1
           readnum=`expr "$line" : "^==\+\([[:digit:]]\+\)$"`
           if [ -z $readnum ]; then readnum=0; fi
+        elif [[ "$line" =~ ^--+ ]]; then
+          # repeated -----
+          error=1
         else
           TESTOS[$TESTIONUM]+="\n$line"
         fi
