@@ -240,7 +240,12 @@ function settestios { # testioname
   # else [ $wheio != -1 ]; fi
   if [ $error != 0 ] || [ $wheio == -1 -a $wheiof == 0 ]; then
     return $lineno
-  else
+  else # parsed successfully
+    # eliminate leading newline
+    for i in `seq $TESTIONUM`; do
+      TESTIS[$[i-1]]=${TESTIS[$[i-1]]:2}
+      TESTOS[$[i-1]]=${TESTOS[$[i-1]]:2}
+    done
     return 0
   fi
 }
