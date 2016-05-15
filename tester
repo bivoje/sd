@@ -160,7 +160,7 @@ function settestios { # testioname
   local lineno=0 # for error reporting
   local readnum=0
   local error=0
-  TESTIONUM=0
+  TESTIONUM=0 # used as index of TESTIS, TESTOS in the loop
   # erasing previouse variables
   TESTIS[0]=
   TESTOS[0]=
@@ -225,10 +225,20 @@ function settestios { # testioname
     if [ $error != 0 ]; then break; fi
   done < $TESTIONAME
 
+
+  # if last lines were comments
+  if [ $wheio == -1 -a $wheiof == 1 ]; then
+    TESTIS[$TESTIONUM]=""
+    ((TESTIONUM--))
+  fi
+
+  # index number -> length of array
+  ((TESTIONUM++))
+
   #if [ $error != 0 ]; then false;
   #  # wheio should be -1 (input) when it's end
   # else [ $wheio != -1 ]; fi
-  if [ $error != 0 ] || [ $wheio != 0 ]; then
+  if [ $error != 0 ] || [ $wheio == -1 -a $wheiof == 0 ]; then
     return $lineno
   else
     return 0
