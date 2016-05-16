@@ -153,6 +153,17 @@ function setcmplneed { # src,exec name
   fi
 }
 
+function checktestios {
+  echo testionum: $TESTIONUM
+  for i in `seq $TESTIONUM`; do
+    echo INPUT $i ==============
+    echo -e ${TESTIS[$[i-1]]}
+    echo OUTPUT $i -------------
+    echo -e ${TESTOS[$[i-1]]}
+  done
+  echo done! =================
+}
+
 function settestios { # testioname
   argn 0
 
