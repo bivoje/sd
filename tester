@@ -278,6 +278,16 @@ function testing { # [auto]compile, settestios
   done
 }
 
+function autotesting { # testioname
+  argn 0
+
+  if ! settestios; then
+    echo error on your iofile at line:$?
+  else
+    testing
+  fi
+}
+
 function autocompile { # src/exec name
   argn 0
 
