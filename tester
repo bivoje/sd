@@ -104,6 +104,7 @@ function getcmplcmdfromext {
     "cpp gcc $SOURCENAME -o $EXECNAME"
     "hs  ghc $SOURCENAME -o $EXECNAME"
     "lhs ghc $SOURCENAME -o $EXECNAME"
+    "sh  cp $SOURCENAME $EXECNAME && chmod u+x $EXECNAME"
     )
 
   for val in "${map[@]}"; do
