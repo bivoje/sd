@@ -258,9 +258,24 @@ function compile { # cmplcmd
   $CMPLCMD
 }
 
-function testing {
-echo ""
-#TODO
+function testing { # [auto]compile, settestios
+  argn 0
+
+  local testos=
+  local clmwidth=20
+
+  for i in `seq 0 $[TESTIONUM-1]`; do
+    testos="`echo -e ${TESTIS[$i]} | ./$EXECNAME`"
+
+    diferr=`diff -y --width=$clmwidth \
+                 <(echo -e "${TESTOS[$i]}") \
+                 <(echo -e "$testos")`
+
+    if [ $? != 0 ]; then
+      echo === ERROR for input $[i+1] !!
+      echo "$diferr"
+    fi
+  done
 }
 
 function autocompile { # src/exec name
