@@ -107,7 +107,7 @@ function getcmplcmdfromext {
   local ext=$1
   local map=(
     "c   gcc $SOURCENAME -o $EXECNAME"
-    "cpp gcc $SOURCENAME -o $EXECNAME"
+    "cpp g++ $SOURCENAME -o $EXECNAME"
     "hs  ghc $SOURCENAME -o $EXECNAME"
     "lhs ghc $SOURCENAME -o $EXECNAME"
     "sh  cp $SOURCENAME $EXECNAME && chmod u+x $EXECNAME"
