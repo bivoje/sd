@@ -117,14 +117,6 @@ function getcmplcmdfromext {
   echo $cmplcmd
 }
 
-function setcmplcmdi { # src name
-  argn 0
-
-  local ext=`getextension $SOURCENAME`
-  local ncmplcmd=`getcmplcmdfromext $ext`
-  CMPLCMD=${CMPLCMD:-$ncmplcmd}
-}
-
 function setcmplneed { # wkdir, src,exec name
   argn 0
 
@@ -264,16 +256,25 @@ function v_settestios { # testioname
 # vertify later works goes well
 # satisfy basic dependence
 function v_load_tester {
+  argn 0
 
-  # if variable already not set
+  # if variable not set yet
   SOURCENAME=${SOURCENAME:-main.c}
   EXECNAME=${EXECNAME:-main}
 
-  local ext=`getextension $SOURCENAME`
-  local ncmplcmd=`getcmplcmdfromext $ext`
-  CMPLCMD=${CMPLCMD:-$ncmplcmd}
+  if ! [ -d $WKDIR ]; then return 1; fi
+
+  # if variable not set yet
+  if [ -n $CMDLCMD ]; then
+    local ext=`getextension $SOURCENAME`
+    CMPLCMD=`getcmplcmdfromext $ext`
+    if [ -n CMPLCMD ]; then return 2; fi
+  fi
 
   return 0
+  # 0 = success, all works fine!
+  # 1 = no WKDIR found
+  # 2 = unrecognizable source file extension.
 }
 
 function compile { # wkdir, cmplcmd
