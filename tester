@@ -3,12 +3,18 @@
 # this is a tester module for sd
 
 # conventions
-# get..    name denotes functions which
-#          put value to stdout
-# set..    name denotes functions which
-#          set the global variable
-# set..i   name denotes functions which
-#          will set if variable not previously set
+# names  | denotes functions which
+# -------|--------------------------
+# get..    echos value to stdout
+# set..    set the global variable
+# [x]_..   returns meaningful value
+#  x=b      boolean success
+#  x=v      result value
+# __..     used for macros
+# else     user-interaction routines.
+#   auto..   frontend routines.
+
+# debug utilities..
 # argn     function - which actually alias -
 #          checks proper number of argument was given
 # assert   same as ASSERT macro in C language
@@ -29,10 +35,10 @@
 # }
 
 shopt -s expand_aliases
-alias argn='_argn $0 $LINENO $#'
-alias assert='_assert $0 $LINENO'
+alias argn='__argn $0 $LINENO $#'
+alias assert='__assert $0 $LINENO'
 
-function _argn {
+function __argn {
   if [ $# != 4 ]; then
     echo ARGNERROR! on $2 th line of \"$1\"
     if [ $# == 3 ]; then
@@ -46,7 +52,7 @@ function _argn {
   fi
 }
 
-function _assert {
+function __assert {
   if [ $# != 3 ]; then
     echo ASSERTERROR! on $2 th line of \"$1\"
     if [ $# == 2 ]; then
@@ -117,7 +123,7 @@ function getcmplcmdfromext {
   echo $cmplcmd
 }
 
-function setcmplcmdi { #src name
+function setcmplcmdi { # src name
   argn 0
 
   local ext=`getextension $SOURCENAME`
@@ -164,7 +170,7 @@ function checktestios {
   echo done! =================
 }
 
-function settestios { # testioname
+function v_settestios { # testioname
   argn 0
 
   local wheio=0 # parsing on input(-1), comment(0), output(1)
@@ -251,16 +257,19 @@ function settestios { # testioname
   #  # wheio should be -1 (input) when it's end
   # else [ $wheio != -1 ]; fi
   if [ $error != 0 ] || [ $wheio == -1 -a $wheiof == 0 ]; then
-    return $lineno
+    return $lineno # always lineno > 0
   else # parsed successfully
     # eliminate leading newline
     for i in `seq $TESTIONUM`; do
       TESTIS[$[i-1]]=${TESTIS[$[i-1]]:2}
       TESTOS[$[i-1]]=${TESTOS[$[i-1]]:2}
     done
-    return 0
+    return 0 # success
   fi
 }
+
+#======================================================================
+# user-interaction
 
 function compile { # cmplcmd
   argn 0
@@ -292,7 +301,7 @@ function testing { # [auto]compile, settestios
 function autotesting { # testioname
   argn 0
 
-  if ! settestios; then
+  if ! v_settestios; then
     echo error on your iofile at line:$?
   else
     testing
