@@ -32,6 +32,7 @@
 #     3 exec has created manually
 # , TESTIS
 # , TESTOS
+# , WKDIR
 # }
 
 shopt -s expand_aliases
@@ -66,24 +67,17 @@ function __assert {
   fi
 }
 
-function getsrcmoddate {
-echo ""
-#TODO
+function b_ismodified { # wkdir
+  argn 1
+
+  diff $1 $WKDIR/$1 > /dev/null
+  return $?
 }
 
-function getexecmoddate {
-echo ""
-#TODO
-}
+function upmodstate { # wkdir
+  argn 1
 
-function uptsrcmoddate {
-echo ""
-#TODO
-}
-
-function upexecmoddate {
-echo ""
-#TODO
+  cp $1 $WKDIR/$1
 }
 
 function getextension {
@@ -131,7 +125,7 @@ function setcmplcmdi { # src name
   CMPLCMD=${CMPLCMD:-$ncmplcmd}
 }
 
-function setcmplneed { # src,exec name
+function setcmplneed { # wkdir, src,exec name
   argn 0
 
   local srcmoddate=
@@ -142,15 +136,11 @@ function setcmplneed { # src,exec name
   if ! [ -e $EXECNAME ]; then
     CMPLNEED=1
   else
-    srcmoddate=`stat $SOURCENAME -c %y`
-    osrcmoddate=`getsrcmoddate`
-    if [ "$srcmoddate" != "$osrcmoddate" ]; then
+    if ismodified $SOURCENAME ; then
       CMPLNEED=2
     else
-      execmoddate=`stat $EXECNAME -c %y`
-      oexecmoddate=`getexecmoddate`
       # user might have compiled by him/herself
-      if [ "$execmoddate" != "$oexecmoddate" ]; then
+      if ismodified $EXECNAME ; then
         CMPLNEED=3
       else
         CMPLNEED=0
@@ -286,11 +276,11 @@ function v_load_tester {
   return 0
 }
 
-function compile { # cmplcmd
+function compile { # wkdir, cmplcmd
   argn 0
 
   echo $CMPLCMD
-  $CMPLCMD
+  $CMPLCMD && upmodstate $EXECNAME && upmodstate $SOURCENAME
 }
 
 function testing { # [auto]compile, settestios
