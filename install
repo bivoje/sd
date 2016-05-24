@@ -1,0 +1,68 @@
+#!/bin/bash -x
+
+PATHDIR=
+
+function isroot {
+  [ "root" == `whoami` ]
+}
+
+function addpath {
+  if [ $# != 1 ]; then
+    echo go to developer and show this message
+    exit
+  elif [[ $PATH =~ (^|:)$1(:|$\n) ]]; then
+    return 1
+  else
+    echo "if ! [[ \$PATH =~ (^|:)$1(:|$) ]]; then PATH+=:$1; fi" >> ~/.bashrc
+    PATH+=:$1
+    return 0
+  fi
+}
+
+case $# in
+  0)
+    if isroot; then
+      PATHDIR=/opt
+    else
+      if ! [ -d ~/bin ];
+        then mkdir ~/bin
+      fi
+      PATHDIR=~/bin
+      addpath ~/bin
+    fi
+    ;;
+  1)
+    PATHDIR=$1
+    if [ -d $PATHDIR ]; then
+      echo "dir \"$PATHDIR\" doesn't exist!"
+      exit 1
+    fi
+    ;;
+  *)
+    echo "need one (or default) dirname to install"
+    echo "try just 'sudo install' (/opt), 'install' (~/bin),"
+    echo "or install <dirname>"
+    exit 1
+    ;;
+esac
+
+# guarantee [ -n $PATHDIR ]
+
+if [ -d $PATHDIR/sd -o -f $PATHDIR/sd ]; then
+  echo "you already have tester installed in \"$PATHDIR\""
+  echo "it might be a part of another program,"
+  echo "or this is not the first time you installing tester"
+  read -p "do you want to force overwrite? (y or n) " ans
+  case $ans in
+    [Yy] ) rm -r $PATHDIR/sd ;;
+    [Nn] ) echo install abort; exit 0 ;;
+    *    ) echo "please answer in y or n"; exit 0 ;;
+  esac
+fi
+
+mkdir $PATHDIR/sd
+
+cp tester $PATHDIR/sd/tester
+chmod u+x $PATHDIR/sd/tester
+
+exit 0
