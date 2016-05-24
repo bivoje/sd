@@ -271,6 +271,21 @@ function v_settestios { # testioname
 #======================================================================
 # user-interaction
 
+# vertify later works goes well
+# satisfy basic dependence
+function v_load_tester {
+
+  # if variable already not set
+  SOURCENAME=${SOURCENAME:-main.c}
+  EXECNAME=${EXECNAME:-main}
+
+  local ext=`getextension $SOURCENAME`
+  local ncmplcmd=`getcmplcmdfromext $ext`
+  CMPLCMD=${CMPLCMD:-$ncmplcmd}
+
+  return 0
+}
+
 function compile { # cmplcmd
   argn 0
 
