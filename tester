@@ -80,6 +80,7 @@ function upmodstate { # wkdir
   cp $1 $WKDIR/$1
 }
 
+# echos nothing on failure
 function getextension {
   argn 1
 
@@ -120,19 +121,14 @@ function getcmplcmdfromext {
 function setcmplneed { # wkdir, src,exec name
   argn 0
 
-  local srcmoddate=
-  local osrcmoddate=
-  local execmoddate=
-  local oexecmoddate=
-
   if ! [ -e $EXECNAME ]; then
     CMPLNEED=1
   else
-    if ismodified $SOURCENAME ; then
+    if ! b_ismodified $SOURCENAME ; then
       CMPLNEED=2
     else
       # user might have compiled by him/herself
-      if ismodified $EXECNAME ; then
+      if ! b_ismodified $EXECNAME ; then
         CMPLNEED=3
       else
         CMPLNEED=0
@@ -156,6 +152,7 @@ function v_settestios { # testioname
   argn 0
 
   local wheio=0 # parsing on input(-1), comment(0), output(1)
+  #TODO wheio=-1 this enales ommiting first =====
   local wheiof=0 # explicit 0, successive 1
   local lineno=0 # for error reporting
   local readnum=0
@@ -223,7 +220,7 @@ function v_settestios { # testioname
         ;;
     esac
     if [ $error != 0 ]; then break; fi
-  done < $TESTIONAME
+  done <<< $TESTIONAME
 
 
   # if last lines were comments
@@ -268,7 +265,7 @@ function v_load_tester {
   if [ -n $CMDLCMD ]; then
     local ext=`getextension $SOURCENAME`
     CMPLCMD=`getcmplcmdfromext $ext`
-    if [ -n CMPLCMD ]; then return 2; fi
+    if [ -n "$CMPLCMD" ]; then return 2; fi
   fi
 
   return 0
@@ -322,16 +319,15 @@ function autocompile { # src/exec name
   if [ $CMPLNEED == 3 ]; then
     echo you have executable compiled manually!
     while true; do
-      read -p "would you compile it again with sd? \(y or n\)" ans
+      read -p "would you compile it again with sd? (y or n)" ans
       case $ans in
-        [Yy]* ) setcmplcmdi; compile; break;;
+        [Yy]* ) compile; break;;
         [Nn]* ) break;;
         *     ) echo please answer y or n;;
       esac
     done
 
   elif [ $CMPLNEED != 0 ]; then
-    setcmplcmdi
     compile
   fi
 }
