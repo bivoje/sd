@@ -1,0 +1,86 @@
+#!/bin/bash
+
+WKDIR=.sd
+# sd --help iofile
+# sd eliminate
+# CMPLCMD only needed when compile;
+
+. tester
+
+function set_var {
+  argn 2
+
+  set_fig $1 $2
+}
+
+function get_vars {
+  argn 0
+
+  local varname=
+  local varvalue=
+
+  while read line; do
+    varname=`echo $line | cut -d= -f1`
+    varvalue=`expr $line : "varname=\(.*\)$"`
+    echo $varname = \"$varvalue\"
+  done < $WKDIR/fig
+}
+
+function interactive_init {
+  argn 0
+
+  # tester parts
+
+  if [ -d $WKDIR ]; then
+    echo sd repository already exist!
+    echo if you want to restart - erase all data
+    echo try \"eliminate\" and then \"init\" again
+    return 1
+  fi
+
+  mkdir $WKDIR
+  mkdir $WKDIR/snap
+  touch $WKDIR/fig
+
+  srccnds=`ls | grep ".\+\.[a-z]\+$"`
+  if [ 1 == `echo $srccnds | wc -l` ]; then
+    echo it seems you have only one file in this directory.
+    echo -n "do you want to start with \"$srccnds\"? (y/n) "
+    read ans
+    case $ans in
+      [Yy] ) echo "SOURCENAME=$srccnds" >> $WKDIR/fig ;;
+      *    ) break ;;
+    esac
+  fi
+}
+
+if [ $# == 0 ]; then
+  # some work
+  exit 1
+fi
+
+if [ $1 == "init" ]; then
+  interactive_init
+  exit
+fi
+
+if v_load_tester; then
+  # erro occured
+  case $? in
+    # error parsing
+    * ) exit $? ;;
+  esac
+fi
+
+case $1 in
+  # compile
+
+  #need more gentle version of arng for user
+  "co" ) argn 1; autocompile ;;
+  "te" ) argn 1; autotesting ;;
+
+  "set") argn 3; set_var $2 $3 ;;
+  "get") if [ $# == 0 ]; then get_vars;
+         else for i in `seq 2 $#`; do echo ${!i} = `get_fig ${!i}`; done
+         fi ;;
+esac
