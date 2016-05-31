@@ -69,6 +69,26 @@ function __assert {
   fi
 }
 
+function set_fig { # wkdir
+  argn 2
+
+  local num=`grep $WKDIR/fig -e "^$1=" -c`
+
+  if [ $num == 1 ]; then
+    sed "s/^$1=.*$/$1=$2/" $WKDIR/fig > $WKDIR/fig.m
+    mv $WKDIR/fig.m $WKDIR/fig
+  elif [ $num == 0 ]; then
+    echo "$1=$2" >> $WKDIR/fig
+  else
+    echo duplicated fig \"$1\" apeared!
+  fi
+}
+
+function get_fig { # wkdir
+  local line=`grep $WKDIR/fig -e "^$1"`
+  expr "$line" : "^$1=\(.*\)$"
+}
+
 function b_ismodified { # wkdir
   argn 1
 
