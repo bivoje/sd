@@ -32,7 +32,9 @@
 #     3 exec has created manually
 # , TESTIS
 # , TESTOS
-# , WKDIR
+# , WKDIR -- guarantee following structure
+#     /snap
+#     fig
 # }
 
 shopt -s expand_aliases
@@ -70,14 +72,15 @@ function __assert {
 function b_ismodified { # wkdir
   argn 1
 
-  diff $1 $WKDIR/$1 > /dev/null
+  # diff will return 2 if there's no such file
+  diff $1 $WKDIR/snap/$1 &> /dev/null
   return $?
 }
 
 function upmodstate { # wkdir
   argn 1
 
-  cp $1 $WKDIR/$1
+  cp $1 $WKDIR/snap/$1
 }
 
 # echos nothing on failure
@@ -255,11 +258,16 @@ function v_settestios { # testioname
 function v_load_tester {
   argn 0
 
+  if ! [ -d $WKDIR ]; then return 1; fi
+  if ! [ -d $WKDIR/snap -o -f $WKDIR/fig ]; then return 2; fi
+
+  # load up variables
+  # isn't it (sourcing) dangerous?
+  source $WKDIR/fig
+
   # if variable not set yet
   SOURCENAME=${SOURCENAME:-main.c}
-  EXECNAME=${EXECNAME:-main}
-
-  if ! [ -d $WKDIR ]; then return 1; fi
+  EXECNAME=`echo $SOURCENAME | sed "s/^\(.\+\)\.[a-z]\+$/\1/"`
 
   # if variable not set yet
   if [ -n $CMDLCMD ]; then
@@ -271,7 +279,8 @@ function v_load_tester {
   return 0
   # 0 = success, all works fine!
   # 1 = no WKDIR found
-  # 2 = unrecognizable source file extension.
+  # 2 = required structure of WKDIR damaged
+  # 3 = unrecognizable source file extension.
 }
 
 function compile { # wkdir, cmplcmd
@@ -301,10 +310,13 @@ function testing { # [auto]compile, settestios
   done
 }
 
-function autotesting { # testioname
+function autotesting {
   argn 0
 
-  if ! v_settestios; then
+  if [ -z "$TESTIONAME" ]; then
+    echo no iofile yet..
+    echo see \"sd --help iofile\"
+  elif ! v_settestios; then
     echo error on your iofile at line:$?
   else
     testing
