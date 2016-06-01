@@ -1,0 +1,11 @@
+usage: sd <command> | sd --help
+
+init | remove                        :before integrity check
+  init-initialize, remove-terminate
+
+co | te                         :with source of a version
+  co-compile with options -- standard for the icpc
+  te-test with IO files, hide compile warning messages
+
+help | --help                        :when you don't know what to do
+  print this manual

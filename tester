@@ -335,7 +335,7 @@ function autotesting {
 
   if [ -z "$TESTIONAME" ]; then
     echo no iofile yet..
-    echo see \"sd --help iofile\"
+    echo see iofile section of \"sd --help\"
   elif ! v_settestios; then
     echo error on your iofile at line:$?
   else

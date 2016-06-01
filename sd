@@ -23,6 +23,10 @@ function get_vars {
   done < $WKDIR/fig
 }
 
+function help_message {
+  cat help_message.txt
+}
+
 function interactive_init {
   argn 0
 
@@ -106,4 +110,9 @@ case $1 in
   "get") if [ $# == 0 ]; then get_vars;
          else for i in `seq 2 $#`; do echo ${!i} = `get_fig ${!i}`; done
          fi ;;
+
+  "help") help_message ;;
+  "--help") help_message ;;
+
+  *    ) echo try command \"sd --help\"
 esac
