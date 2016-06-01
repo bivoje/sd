@@ -346,6 +346,12 @@ function autotesting {
 function autocompile { # src/exec name
   argn 0
 
+  if ! [ -f $SOURCENAME ]; then
+    echo "can't find source file \"$SOURCENAME\""
+    echo "re-set the correct source name manually"
+    echo "using command \"sd set SOURCENAME <sourcename>\""
+    return
+  fi
   setcmplneed
   #CHECKME
   if [ $CMPLNEED == 3 ]; then
