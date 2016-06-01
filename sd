@@ -1,9 +1,6 @@
 #!/bin/bash
 
 WKDIR=.sd
-# sd --help iofile
-# sd eliminate
-# CMPLCMD only needed when compile;
 
 . tester
 
@@ -33,8 +30,7 @@ function interactive_init {
 
   if [ -d $WKDIR ]; then
     echo sd repository already exist!
-    echo if you want to restart - erase all data
-    echo try \"eliminate\" and then \"init\" again
+    echo if you want to restart try \"remove\" and then \"init\" again
     return 1
   fi
 
@@ -47,22 +43,49 @@ function interactive_init {
     echo it seems you have only one file in this directory.
     echo -n "do you want to start with \"$srccnds\"? (y/n) "
     read ans
-    case $ans in
-      [Yy] ) echo "SOURCENAME=$srccnds" >> $WKDIR/fig ;;
-      *    ) break ;;
-    esac
+    if [[ "$ans" =~ [yY].* ]]; then
+      echo "SOURCENAME=$srccnds" >> $WKDIR/fig
+    fi
   fi
 }
 
-if [ $# == 0 ]; then
-  # some work
-  exit 1
-fi
+function interactive_remove {
+  argn 0
 
-if [ $1 == "init" ]; then
-  interactive_init
+  if ! [ -d $WKDIR ]; then
+    echo "there's nothing to remove on this directory"
+    return
+  fi
+
+  echo -n "do you really want to erase all data achieved by sd? (y/n) "
+  read ans
+  if ! [[ "$ans" =~ [yY].* ]]; then echo "removing halted"; return; fi
+  echo -n "are you sure?? sincerely ALL the data would be erased. (y/n) "
+  read ans
+  if ! [[ "$ans" =~ [yY].* ]]; then echo "removing halted"; return; fi
+  echo "there's no way you can retrieve removed data."
+  echo -n "final confirm required. type EXACTLY! (YES/NO) "
+  read ans
+  if [ "$ans" != "YES" ]; then echo "removing halted"; return; fi
+
+  echo eliminating start!
+
+  rm -rf $WKDIR
+
+  echo eliminating done!
+}
+
+if [ $# == 0 ]; then
+  # some proper work work
+  # current code is temporary
+  help_message
   exit
 fi
+
+case $1 in
+  "init"  ) interactive_init; exit ;;
+  "remove") interactive_remove; exit ;;
+esac
 
 if v_load_tester; then
   # erro occured
