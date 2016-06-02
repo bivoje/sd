@@ -1,0 +1,39 @@
+#!/bin/bash
+
+# exporting variables
+# { VERSION
+# }
+
+. tester
+
+function b_init_shortc {
+  argn 0
+
+  if ! b_init_tester; then return 1; fi
+  mkdir $WKDIR/versions
+
+  #this should be separated as updating routine
+  echo 0 > $WKDIR/version
+
+  return 0;
+}
+
+function v_load_shortc {
+  argn 0
+
+  if ! v_load_tester; then return $?; fi
+
+  if ! [ -d $WKDIR/versions ]; then return 11; fi
+  if ! [ -f $WKDIR/version ]; then return 12; fi
+
+  VERSION=`cat $WKDIR/version`
+
+  local num=`ls $WKDIR/versions | wc -l`
+  if [ $num != $VERSION ]; then return 13; fi
+
+  return 0
+  # 0 = success, all works fine!
+  # 1 = WKDIR/versions damaged
+  # 2 = WKDIR/version damaged
+  # 3 = versions are not properly perserved
+}

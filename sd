@@ -1,6 +1,6 @@
 #!/bin/bash
 
-. tester
+. shortc
 
 alias b_argn='__b_argn $#'
 
@@ -45,13 +45,7 @@ function help_message {
 function interactive_init {
   argn 0
 
-  while true; do
-
-    # tester parts
-    if ! b_init_tester; then break; fi
-
-    return 0
-  done
+  if b_init_shortc; then return 0; fi
 
   echo initializing halted
   rm -rf $WKDIR &> /dev/null
@@ -87,24 +81,29 @@ function interactive_remove {
 function interative_load {
   argn 0
 
-  # load up variables
-  # isn't it (sourcing) dangerous?
-  source $WKDIR/fig
+  v_load_shortc
+  local re=$?
+  case $re in
+    # no error
+    0 ) return 0 ;;
 
-  if v_load_tester; then
-    # erro occured
-    case $? in
-      # error parsing
-      1 ) echo no sd repository found!
-          echo if you want to start, \"sd init\" ;;
-      2 ) echo sd repository damaged..  you need to rebuild whole
-          echo using \"sd remove\" and \"sd init\" ;;
-      3 ) echo yousr source file extension unrecognizable!
-          echo "re-set manually by \"sd set SOURCENAME <srcname>\"" ;;
-      * ) exit $? ;;
-    esac
-    exit
-  fi
+    # tester error parsing
+    1 ) echo no sd repository found!
+        echo if you want to start, \"sd init\" ;;
+    2 ) echo sd repository damaged..  you need to rebuild whole
+        echo using \"sd remove\" and \"sd init\" ;;
+    3 ) echo yousr source file extension unrecognizable!
+        echo "re-set manually by \"sd set SOURCENAME <srcname>\"" ;;
+
+    # shortc error parsing
+    11 ) echo WKDIR/versions damaged
+          echo use \"sd remove\" and \"sd init\" to restart ;;
+    12 ) echo WKDIR/version damaged
+          echo use \"sd remove\" and \"sd init\" to restart ;;
+    13 ) echo versions are not properly perserved
+          echo use \"sd remove\" and \"sd init\" to restart ;;
+    * ) echo unknown error $re; exit ;;
+  esac
 }
 
 if [ $# == 0 ]; then
@@ -120,11 +119,10 @@ esac
 interative_load
 
 case $1 in
-  # compile
 
-  #need more gentle version of arng for user
   "co" ) b_argn 1 && autocompile ;;
   "te" ) b_argn 1 && autotesting ;;
+  "ve" ) echo current on ver.$VERSION ;;
 
   "set") b_argn 3 && set_var $2 $3 ;;
   "get") if [ $# == 1 ]; then get_vars;

@@ -276,7 +276,7 @@ function v_settestios { # testioname
 # user-interaction
 
 function b_init_tester {
-  argn 1
+  argn 0
 
   if [ -d $WKDIR ]; then
     echo sd repository already exist!
@@ -284,10 +284,9 @@ function b_init_tester {
     return 1
   fi
 
-  if ! mkdir $WKDIR; then return 1; fi
+  if ! mkdir $WKDIR; then return 2; fi
   touch $WKDIR/fig
-
-  if ! mkdir $WKDIR/snap; then return 2; fi
+  mkdir $WKDIR/snap
 
   srccnds=`ls | grep ".\+\.[a-z]\+$"`
   if [ 1 == `echo $srccnds | wc -l` ]; then
@@ -319,10 +318,10 @@ function v_load_tester {
   EXECNAME=`echo $SOURCENAME | sed "s/^\(.\+\)\.[a-z]\+$/\1/"`
 
   # if variable not set yet
-  if [ -n $CMDLCMD ]; then
+  if [ -z "$CMDLCMD" ]; then
     local ext=`getextension $SOURCENAME`
     CMPLCMD=`getcmplcmdfromext $ext`
-    if [ -n "$CMPLCMD" ]; then return 2; fi
+    if [ -z "$CMPLCMD" ]; then return 3; fi
   fi
 
   return 0
