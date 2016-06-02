@@ -1,7 +1,5 @@
 #!/bin/bash
 
-WKDIR=.sd
-
 . tester
 
 alias b_argn='__b_argn $#'
@@ -47,16 +45,7 @@ function help_message {
 function interactive_init {
   argn 0
 
-  if [ -d $WKDIR ]; then
-    echo sd repository already exist!
-    echo if you want to restart try \"remove\" and then \"init\" again
-    return 1
-  fi
-
   while true; do
-
-    #sd parts
-    if ! mkdir $WKDIR; then break; fi
 
     # tester parts
     if ! b_init_tester; then break; fi
@@ -95,6 +84,29 @@ function interactive_remove {
   echo eliminating done!
 }
 
+function interative_load {
+  argn 0
+
+  # load up variables
+  # isn't it (sourcing) dangerous?
+  source $WKDIR/fig
+
+  if v_load_tester; then
+    # erro occured
+    case $? in
+      # error parsing
+      1 ) echo no sd repository found!
+          echo if you want to start, \"sd init\" ;;
+      2 ) echo sd repository damaged..  you need to rebuild whole
+          echo using \"sd remove\" and \"sd init\" ;;
+      3 ) echo yousr source file extension unrecognizable!
+          echo "re-set manually by \"sd set SOURCENAME <srcname>\"" ;;
+      * ) exit $? ;;
+    esac
+    exit
+  fi
+}
+
 if [ $# == 0 ]; then
   help_message
   exit
@@ -105,20 +117,7 @@ case $1 in
   "remove") interactive_remove; exit ;;
 esac
 
-if v_load_tester; then
-  # erro occured
-  case $? in
-    # error parsing
-    1 ) echo no sd repository found!
-        echo if you want to start, \"sd init\" ;;
-    2 ) echo sd repository damaged..  you need to rebuild whole
-        echo using \"sd remove\" and \"sd init\" ;;
-    3 ) echo yousr source file extension unrecognizable!
-        echo "re-set manually by \"sd set SOURCENAME <srcname>\"" ;;
-    * ) exit $? ;;
-  esac
-  exit
-fi
+interative_load
 
 case $1 in
   # compile

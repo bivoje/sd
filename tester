@@ -41,6 +41,8 @@ shopt -s expand_aliases
 alias argn='__argn $0 $LINENO $#'
 alias assert='__assert $0 $LINENO'
 
+WKDIR=.sd
+
 function __argn {
   if [ $# != 4 ]; then
     echo ARGNERROR! on $2 th line of \"$1\"
@@ -276,8 +278,16 @@ function v_settestios { # testioname
 function b_init_tester {
   argn 1
 
-  mkdir $WKDIR/snap
+  if [ -d $WKDIR ]; then
+    echo sd repository already exist!
+    echo if you want to restart try \"remove\" and then \"init\" again
+    return 1
+  fi
+
+  if ! mkdir $WKDIR; then return 1; fi
   touch $WKDIR/fig
+
+  if ! mkdir $WKDIR/snap; then return 2; fi
 
   srccnds=`ls | grep ".\+\.[a-z]\+$"`
   if [ 1 == `echo $srccnds | wc -l` ]; then
@@ -285,7 +295,7 @@ function b_init_tester {
     echo -n "do you want to start with \"$srccnds\"? (y/n) "
     read ans
     if [[ "$ans" =~ [yY].* ]]; then
-      echo "SOURCENAME=$srccnds" >> $WKDIR/fig
+      set_fig SOURCENAME $srccnds
     fi
   fi
 
