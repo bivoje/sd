@@ -273,6 +273,25 @@ function v_settestios { # testioname
 #======================================================================
 # user-interaction
 
+function b_init_tester {
+  argn 1
+
+  mkdir $WKDIR/snap
+  touch $WKDIR/fig
+
+  srccnds=`ls | grep ".\+\.[a-z]\+$"`
+  if [ 1 == `echo $srccnds | wc -l` ]; then
+    echo it seems you have only one file in this directory.
+    echo -n "do you want to start with \"$srccnds\"? (y/n) "
+    read ans
+    if [[ "$ans" =~ [yY].* ]]; then
+      echo "SOURCENAME=$srccnds" >> $WKDIR/fig
+    fi
+  fi
+
+  return 0;
+}
+
 # vertify later works goes well
 # satisfy basic dependence
 function v_load_tester {

@@ -47,27 +47,26 @@ function help_message {
 function interactive_init {
   argn 0
 
-  # tester parts
-
   if [ -d $WKDIR ]; then
     echo sd repository already exist!
     echo if you want to restart try \"remove\" and then \"init\" again
     return 1
   fi
 
-  mkdir $WKDIR
-  mkdir $WKDIR/snap
-  touch $WKDIR/fig
+  while true; do
 
-  srccnds=`ls | grep ".\+\.[a-z]\+$"`
-  if [ 1 == `echo $srccnds | wc -l` ]; then
-    echo it seems you have only one file in this directory.
-    echo -n "do you want to start with \"$srccnds\"? (y/n) "
-    read ans
-    if [[ "$ans" =~ [yY].* ]]; then
-      echo "SOURCENAME=$srccnds" >> $WKDIR/fig
-    fi
-  fi
+    #sd parts
+    if ! mkdir $WKDIR; then break; fi
+
+    # tester parts
+    if ! b_init_tester; then break; fi
+
+    return 0
+  done
+
+  echo initializing halted
+  rm -rf $WKDIR &> /dev/null
+  return 1
 }
 
 function interactive_remove {
