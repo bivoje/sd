@@ -1,11 +1,37 @@
 usage: sd <command> | sd --help
 
 init | remove                        :before integrity check
-  init-initialize, remove-terminate
+  -init
+  inititialize sd repository for current directory.
+  it's the first job to do before utilize any functionality of sd.
+  if sd repository already exist, it will report error.
 
-co | te                         :with source of a version
-  co-compile with options -- standard for the icpc
-  te-test with IO files, hide compile warning messages
+  -remove
+  remove sd reposityroy for current directory.
+  all data will be lost, no recuvery supported.
+  that's why this commands require comfirmation 3 times, which
+  last comfirm require the EXACT ANSWER (YES) to proceed.
+
+set <figname> <val> | get <figname>  :topic configure
+  -set <figname> <val>
+  set <figname> variable specified in the fig to <val>
+  e.g) sd set SOURCENAME main.c
+  acctually it's just shell variables that will be set when sd runs.
+  so, setting ANY variable is possible to adjust operation of sd.
+  though some variables would be overwritten by loading modules.
+  these are verified variables that you can set (sd will not overwrite)
+    SOURCENAME - source file name
+    EXECNAME   - excuted file name
+    TESTIONAME - IO file name
+
+  -get
+  show the settings in fig.
+
+co | te                              :with source of a version
+  -co
+  compile with default command selected from extension of src.
+  -te
+  test with excutable with input-output set specified in IO files
 
 help | --help                        :when you don't know what to do
   print this manual
