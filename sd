@@ -80,8 +80,6 @@ function interactive_remove {
 }
 
 if [ $# == 0 ]; then
-  # some proper work work
-  # current code is temporary
   help_message
   exit
 fi
@@ -95,8 +93,15 @@ if v_load_tester; then
   # erro occured
   case $? in
     # error parsing
+    1 ) echo no sd repository found!
+        echo if you want to start, \"sd init\" ;;
+    2 ) echo sd repository damaged..  you need to rebuild whole
+        echo using \"sd remove\" and \"sd init\" ;;
+    3 ) echo yousr source file extension unrecognizable!
+        echo "re-set manually by \"sd set SOURCENAME <srcname>\"" ;;
     * ) exit $? ;;
   esac
+  exit
 fi
 
 case $1 in
