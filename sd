@@ -4,6 +4,23 @@ WKDIR=.sd
 
 . tester
 
+alias b_argn='__b_argn $#'
+
+function __b_argn {
+  argn 2
+
+  if [ $1 -lt $2 ]; then
+    echo you need more argument
+    echo read manual !
+    return 1
+  elif [ $1 -gt $2 ]; then
+    echo you supplied too many argument
+    echo read manual !
+    return 1
+  fi
+  return 0
+}
+
 function set_var {
   argn 2
 
@@ -108,11 +125,11 @@ case $1 in
   # compile
 
   #need more gentle version of arng for user
-  "co" ) argn 1; autocompile ;;
-  "te" ) argn 1; autotesting ;;
+  "co" ) b_argn 1 && autocompile ;;
+  "te" ) b_argn 1 && autotesting ;;
 
-  "set") argn 3; set_var $2 $3 ;;
-  "get") if [ $# == 0 ]; then get_vars;
+  "set") b_argn 3 && set_var $2 $3 ;;
+  "get") if [ $# == 1 ]; then get_vars;
          else for i in `seq 2 $#`; do echo ${!i} = `get_fig ${!i}`; done
          fi ;;
 
