@@ -120,9 +120,9 @@ interative_load
 
 case $1 in
 
-  "co" ) b_argn 1 && autocompile ;;
-  "te" ) b_argn 1 && autotesting ;;
-  "ve" ) echo current on ver.$VERSION ;;
+  "co" ) b_argn 1 && b_autocompile ;;
+  "te" ) b_argn 1 && b_autotesting ;;
+  "ve" ) b_argn 1 && echo current on ver.$VERSION ;;
 
   "set") b_argn 3 && set_var $2 $3 ;;
   "get") if [ $# == 1 ]; then get_vars;

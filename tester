@@ -331,14 +331,15 @@ function v_load_tester {
   # 3 = unrecognizable source file extension.
 }
 
-function compile { # wkdir, cmplcmd
+function b_compile { # wkdir, cmplcmd
   argn 0
 
   echo $CMPLCMD
   $CMPLCMD && upmodstate $EXECNAME && upmodstate $SOURCENAME
+  return $?
 }
 
-function testing { # [auto]compile, settestios
+function b_testing { # [auto]compile, settestios
   argn 0
 
   local testos=
@@ -354,11 +355,14 @@ function testing { # [auto]compile, settestios
     if [ $? != 0 ]; then
       echo === ERROR for input $[i+1] !!
       echo "$diferr"
+      return 1
     fi
   done
+
+  return 0
 }
 
-function autotesting {
+function b_autotesting {
   argn 0
 
   if [ -z "$TESTIONAME" ]; then
@@ -367,18 +371,21 @@ function autotesting {
   elif ! v_settestios; then
     echo error on your iofile at line:$?
   else
-    testing
+    b_testing
+    return $?
   fi
+
+  return 1
 }
 
-function autocompile { # src/exec name
+function b_autocompile { # src/exec name
   argn 0
 
   if ! [ -f $SOURCENAME ]; then
     echo "can't find source file \"$SOURCENAME\""
     echo "re-set the correct source name manually"
     echo "using command \"sd set SOURCENAME <sourcename>\""
-    return
+    return 1
   fi
   setcmplneed
   #CHECKME
@@ -387,13 +394,16 @@ function autocompile { # src/exec name
     while true; do
       read -p "would you compile it again with sd? (y or n)" ans
       case $ans in
-        [Yy]* ) compile; break;;
+        [Yy]* ) return `b_compile` ;;
         [Nn]* ) break;;
         *     ) echo please answer y or n;;
       esac
     done
 
   elif [ $CMPLNEED != 0 ]; then
-    compile
+    b_compile
+    return $?
   fi
+
+  return 0
 }
