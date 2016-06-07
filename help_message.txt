@@ -1,6 +1,6 @@
 usage: sd <command> | sd --help
 
-init | remove                        :before integrity check
+init | remove                                  :before integrity check
   -init
   inititialize sd repository for current directory.
   it's the first job to do before utilize any functionality of sd.
@@ -12,7 +12,7 @@ init | remove                        :before integrity check
   that's why this commands require comfirmation 3 times, which
   last comfirm require the EXACT ANSWER (YES) to proceed.
 
-set <figname> <val> | get <figname>  :topic configure
+set <figname> <val> | get [<figname>..]               :topic configure
   -set <figname> <val>
   set <figname> variable specified in the fig to <val>
   e.g) sd set SOURCENAME main.c
@@ -25,13 +25,20 @@ set <figname> <val> | get <figname>  :topic configure
     TESTIONAME - IO file name
 
   -get
-  show the settings in fig.
+  show the settings in fig for specified <figname>s.
+  if none specified, then prints out all figs.
 
-co | te                              :with source of a version
+co | te                                      :with source of a version
   -co
   compile with default command selected from extension of src.
   -te
   test with excutable with input-output set specified in IO files
+  -ne
+  save current version of source code to achieve,
+  then update version number
 
-help | --help                        :when you don't know what to do
+help | --help                          :when you don't know what to do
   print this manual
+
+  fig - what is it (get it from set), topic independent
+  iofile - how to use

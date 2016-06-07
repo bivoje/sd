@@ -2,7 +2,8 @@
 simple, light, bash scripts for testing or achieving codes
 
 design inspired by git.
-produces features make it easy to manage source codes of solvings in a number of programming problems.
+produces features make it easy to manage source codes of solvings,
+in a number of programming problems.
 
 
 FEATURES
@@ -13,14 +14,15 @@ FEATURES
 COMMAND LIST (quick reference)
   usage: sd <command> | sd --help
 
-  init | remove                        :before integrity check
+  init | remove                                :before integrity check
     init-initialize, remove-terminate
 
-  set <figname> <val> | get <figname>  :topic configure
+  set <figname> <val> | get [<figname>..]             :topic configure
     set-set a feature, get show the fig
 
-  co | te                              :with source of a version
+  co | te | ne                               :with source of a version
     co-compile with options, te-test with IO files
+    ne-save current, go to next version
 
   help | --help                        :when you don't know what to do
     print this manual
