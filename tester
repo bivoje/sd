@@ -396,6 +396,14 @@ function b_testing { # [auto]compile, settestios
 function b_autotesting {
   argn 0
 
+  if ! [ -x $EXECNAME ]; then
+    echo no excutable found named \"$EXECNAME\"
+    echo -n "may i compile it for you? (Yes, please \ No thanks) "
+    read ans
+    if ! [[ $ans =~ [yY].* ]]; then return 1; fi
+    if ! b_autocompile; then return 1; fi
+  fi
+
   if [ -z "$TESTIONAME" ]; then
     echo no iofile yet..
     echo see iofile section of \"sd --help\"
