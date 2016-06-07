@@ -6,14 +6,19 @@
 
 . tester
 
+function updateversion {
+  argn 1
+
+  echo $1 > $WKDIR/version
+}
+
 function b_init_shortc {
   argn 0
 
   if ! b_init_tester; then return 1; fi
   mkdir $WKDIR/versions
 
-  #this should be separated as updating routine
-  echo 0 > $WKDIR/version
+  updateversion 0
 
   return 0;
 }
@@ -36,4 +41,23 @@ function v_load_shortc {
   # 1 = WKDIR/versions damaged
   # 2 = WKDIR/version damaged
   # 3 = versions are not properly perserved
+}
+
+function nextversion {
+  argn 0
+
+  local ext=`getextension $SOURCENAME`
+  cp $SOURCENAME $WKDIR/versions/$VERSION.$ext
+  ((VERSION++))
+
+  updateversion $VERSION
+}
+
+function autonextversion {
+  argn 0
+
+  if b_autocompile && b_autotesting; then
+    nextversion
+    echo now on source ver. $VERSION
+  fi
 }
