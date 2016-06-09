@@ -105,6 +105,19 @@ function upmodstate { # wkdir
   cp $1 $WKDIR/snap/$1
 }
 
+function b_interactive_vertifysrc {
+  argn 0
+
+  if ! [ -f $SOURCENAME ]; then
+    echo "can't find source file \"$SOURCENAME\""
+    echo "re-set the correct source name manually"
+    echo "using command \"sd set SOURCENAME <sourcename>\""
+    return 1
+  else
+    return 0
+  fi
+}
+
 # echos nothing on failure
 function getextension {
   argn 1
@@ -222,7 +235,7 @@ function v_settestios { # testioname
         else
           TESTIS[$TESTIONUM]+="\n$line"
         fi
-          ;;
+        ;;
       1 ) # output
         if [ $readnum != 0 ]; then
           TESTOS[$TESTIONUM]+="\n$line"
@@ -420,22 +433,18 @@ function b_autotesting {
 function b_autocompile { # src/exec name
   argn 0
 
-  if ! [ -f $SOURCENAME ]; then
-    echo "can't find source file \"$SOURCENAME\""
-    echo "re-set the correct source name manually"
-    echo "using command \"sd set SOURCENAME <sourcename>\""
-    return 1
-  fi
+  if ! b_interactive_vertifysrc; then return 1; fi
+
   setcmplneed
   #CHECKME
   if [ $CMPLNEED == 3 ]; then
     echo you have executable compiled manually!
     while true; do
-      read -p "would you compile it again with sd? (y or n)" ans
+      read -p "would you compile it again with sd? (y or n) " ans
       case $ans in
-        [Yy]* ) return `b_compile` ;;
-        [Nn]* ) break;;
-        *     ) echo please answer y or n;;
+        [Yy]* ) `b_compile`; return $? ;;
+        [Nn]* ) break ;;
+        *     ) echo please answer y or n ;;
       esac
     done
 

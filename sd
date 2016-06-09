@@ -42,7 +42,7 @@ function help_message {
   cat help_message.txt
 }
 
-function interactive_init {
+function b_interactive_init {
   argn 0
 
   if b_init_shortc; then return 0; fi
@@ -52,37 +52,37 @@ function interactive_init {
   return 1
 }
 
-function interactive_remove {
+function b_interactive_remove {
   argn 0
 
   if ! [ -d $WKDIR ]; then
     echo "there's nothing to remove on this directory"
-    return
+    return 1
   fi
 
   echo -n "do you really want to erase all data achieved by sd? (y/n) "
   read ans
-  if ! [[ "$ans" =~ [yY].* ]]; then echo "removing halted"; return; fi
+  if ! [[ "$ans" =~ [yY].* ]]; then echo "removing halted"; return 1; fi
   echo -n "are you sure?? sincerely ALL the data would be erased. (y/n) "
   read ans
-  if ! [[ "$ans" =~ [yY].* ]]; then echo "removing halted"; return; fi
+  if ! [[ "$ans" =~ [yY].* ]]; then echo "removing halted"; return 1; fi
   echo "there's no way you can retrieve removed data."
   echo -n "final confirm required. type EXACTLY! (YES/NO) "
   read ans
-  if [ "$ans" != "YES" ]; then echo "removing halted"; return; fi
+  if [ "$ans" != "YES" ]; then echo "removing halted"; return 1; fi
 
   echo eliminating start!
-
   rm -rf $WKDIR
-
   echo eliminating done!
+  return 0
 }
 
-function interative_load {
+function b_interactive_load {
   argn 0
 
   v_load_shortc
   local re=$?
+
   case $re in
     # no error
     0 ) return 0 ;;
@@ -97,13 +97,15 @@ function interative_load {
 
     # shortc error parsing
     11 ) echo WKDIR/versions damaged
-          echo use \"sd remove\" and \"sd init\" to restart ;;
+         echo use \"sd remove\" and \"sd init\" to restart ;;
     12 ) echo WKDIR/version damaged
-          echo use \"sd remove\" and \"sd init\" to restart ;;
+         echo use \"sd remove\" and \"sd init\" to restart ;;
     13 ) echo versions are not properly perserved
-          echo use \"sd remove\" and \"sd init\" to restart ;;
-    * ) echo unknown error $re; exit ;;
+         echo use \"sd remove\" and \"sd init\" to restart ;;
+    * )  echo unknown error $re; ;;
   esac
+
+  return $re
 }
 
 if [ $# == 0 ]; then
@@ -112,18 +114,18 @@ if [ $# == 0 ]; then
 fi
 
 case $1 in
-  "init"  ) interactive_init; exit ;;
-  "remove") interactive_remove; exit ;;
+  "init"  ) b_interactive_init; exit ;;
+  "remove") b_interactive_remove; exit ;;
 esac
 
-interative_load
+b_interactive_load
 
 case $1 in
 
   "co" ) b_argn 1 && b_autocompile ;;
   "te" ) b_argn 1 && b_autotesting ;;
   "ve" ) b_argn 1 && echo current on ver.$VERSION ;;
-  "ne" ) b_argn 1 && autonextversion ;;
+  "ne" ) b_argn 1 && b_autonextversion ;;
 
   "set") b_argn 3 && set_var $2 $3 ;;
   "get") if [ $# == 1 ]; then get_vars;

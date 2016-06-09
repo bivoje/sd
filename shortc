@@ -26,7 +26,9 @@ function b_init_shortc {
 function v_load_shortc {
   argn 0
 
-  if ! v_load_tester; then return $?; fi
+  v_load_tester
+  local re=$?
+  if [ $re != 0 ]; then return $re; fi
 
   if ! [ -d $WKDIR/versions ]; then return 11; fi
   if ! [ -f $WKDIR/version ]; then return 12; fi
@@ -53,11 +55,14 @@ function nextversion {
   updateversion $VERSION
 }
 
-function autonextversion {
+function b_autonextversion {
   argn 0
 
-  if b_autocompile && b_autotesting; then
+  if ! b_autotesting; then
+    return 1
+  else
     nextversion
     echo now on source ver. $VERSION
+    return 0
   fi
 }
