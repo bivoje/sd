@@ -125,7 +125,9 @@ case $1 in
   "co" ) b_argn 1 && b_autocompile ;;
   "te" ) b_argn 1 && b_autotesting ;;
   "ve" ) b_argn 1 && echo current on ver.$VERSION ;;
+
   "ne" ) b_argn 1 && b_autonextversion ;;
+  "st" ) b_argn 1 && b_autostat $[VERSION-1] ;;
 
   "set") b_argn 3 && set_var $2 $3 ;;
   "get") if [ $# == 1 ]; then get_vars;

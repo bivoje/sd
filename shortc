@@ -12,6 +12,24 @@ function updateversion {
   echo $1 > $WKDIR/version
 }
 
+function getlinenum {
+  argn 1
+  wc -l $1 | cut -f1 -d " "
+}
+
+function getbytenum {
+  argn 1
+  wc -c $1 | cut -f1 -d " "
+}
+
+function getversionsource {
+  argn 1
+
+  # using argn instead of assertion
+  if ! [[ "$1" =~ [1-9][0-9]* ]]; then argn 0; fi
+  ls $WKDIR/versions | grep "^$1\."
+}
+
 function b_init_shortc {
   argn 0
 
@@ -65,4 +83,45 @@ function b_autonextversion {
     echo now on source ver. $VERSION
     return 0
   fi
+}
+
+function showstat {
+  argn 1
+
+  local linenum=0
+  local bytenum=0
+  local llinenum=0
+  local lbytenum=0
+
+  linenum=$(getlinenum $SOURCENAME)
+  bytenum=$(getbytenum $SOURCENAME)
+  if [ 0 == $VERSION ]; then #inte
+    echo current source is $bytes bytes, in $lines lines
+  else
+    local LASTSRCNAME=$WKDIR/versions/`getversionsource $1`
+    llinenum=$(getlinenum $LASTSRCNAME)
+    lbytenum=$(getbytenum $LASTSRCNAME)
+    echo current source is $bytenum\($[bytenum-lbytenum]\) bytes, in $linenum\($[linenum-llinenum]\) lines
+  fi
+}
+
+# argument: version number to compare
+function b_autostat {
+  argn 1
+
+  if ! b_interactive_vertifysrc; then return 1; fi
+
+  # default latest vs. current
+  # only supports comparing with current version.
+  # sd st 0 4 -> this should be supported
+  if ! [[ "$1" =~ [1-9][0-9]* ]]; then
+    echo please specify the version number
+    echo try \"sd st 0\" to compare current source with initial version
+  elif ! [[ 0 -le $1 ]] && [[ $1 -le $VERSION ]]; then
+    echo specify currect version in range 0 ~ $VERSION
+  else
+    showstat $1
+  fi
+
+  return 0
 }
