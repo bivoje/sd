@@ -361,7 +361,10 @@ function v_load_tester {
 
   # if variable not set yet
   SOURCENAME=${SOURCENAME:-main.c}
-  EXECNAME=`echo $SOURCENAME | sed "s/^\(.\+\)\.[a-z]\+$/\1/"`
+
+  if [ -z "$EXECNAME" ]; then
+    EXECNAME=`echo $SOURCENAME | sed "s/^\(.\+\)\.[a-z]\+$/\1/"`
+  fi
 
   # if variable not set yet
   if [ -z "$CMDLCMD" ]; then
@@ -369,6 +372,8 @@ function v_load_tester {
     CMPLCMD=`getcmplcmdfromext $ext`
     if [ -z "$CMPLCMD" ]; then return 3; fi
   fi
+
+  TESTIONAME=${TESTIONAME:-iofile}
 
   return 0
   # 0 = success, all works fine!
@@ -417,7 +422,7 @@ function b_autotesting {
     if ! b_autocompile; then return 1; fi
   fi
 
-  if [ -z "$TESTIONAME" ]; then
+  if [ -f "$TESTIONAME" ]; then
     echo no iofile yet..
     echo see iofile section of \"sd --help\"
   elif ! v_settestios; then
