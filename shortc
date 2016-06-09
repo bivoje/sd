@@ -125,3 +125,39 @@ function b_autostat {
 
   return 0
 }
+
+function showdiff {
+  argn 1
+
+  if ! b_interactive_vertifysrc; then return 1; fi
+
+  local cmpver=$1
+  local cmpsrc=$WKDIR/versions/`getversionsource $cmpver`
+
+  echo diff ver. $cmpver / $VERSION\(current\)
+  sdiff $cmpsrc $SOURCENAME
+  l1=$(getlinenum $cmpsrc) #inte
+  b1=$(getbytenum $cmpsrc) #inte
+  l2=$(getlinenum $SOURCENAME) #inte
+  b2=$(getbytenum $SOURCENAME) #inte
+  echo $l2\($[l2-l1]\) lines, $b2\($[b2-b1]\) bytes
+}
+
+function b_autodiff {
+  argn 1
+
+  if ! [[ "$1" =~ [1-9][0-9]* ]]; then
+    echo please specify the version number
+    echo try \"sd st 0\" to compare current source with initial version
+  elif ! [ 0 -le $1 -a $1 -le $VERSION ]; then
+    echo specify currect version in range 0 ~ $VERSION
+  else
+    showdiff $1
+  fi
+
+  # default: latest vs. current
+  # one specified: $1 vs. current
+  # two specified: $1 vs. $2
+
+  return 0
+}
