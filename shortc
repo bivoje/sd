@@ -26,8 +26,14 @@ function getversionsource {
   argn 1
 
   # using argn instead of assertion
-  if ! [[ "$1" =~ [1-9][0-9]* ]]; then argn 0; fi
-  ls $WKDIR/versions | grep "^$1\."
+  if ! [[ "$1" =~ [1-9][0-9]*|^0$ ]]; then echo assert; argn 0; fi
+
+  if [ $1 == $VERSION ]; then
+    echo $SOURCENAME
+  else
+    local tmp=`ls $WKDIR/versions | grep "^$1\."`
+    echo $WKDIR/versions/$tmp
+  fi
 }
 
 function b_init_shortc {
@@ -86,41 +92,87 @@ function b_autonextversion {
 }
 
 function showstat {
-  argn 1
+  argn 2
 
-  local linenum=0
-  local bytenum=0
-  local llinenum=0
-  local lbytenum=0
+  local src1=`getversionsource $1`
+  local ln1=$(getlinenum $src1)
+  local bn1=$(getbytenum $src1)
 
-  linenum=$(getlinenum $SOURCENAME)
-  bytenum=$(getbytenum $SOURCENAME)
-  if [ 0 == $VERSION ]; then #inte
-    echo current source is $bytes bytes, in $lines lines
+  if [ $1 == $2 ]; then
+    if [ $1 == $VERSION ]; then
+      echo current source is $bytes bytes, $lines lines
+    else
+      echo source ver.$1 is $bytes bytes, $lines lines
+    fi
   else
-    local LASTSRCNAME=$WKDIR/versions/`getversionsource $1`
-    llinenum=$(getlinenum $LASTSRCNAME)
-    lbytenum=$(getbytenum $LASTSRCNAME)
-    echo current source is $bytenum\($[bytenum-lbytenum]\) bytes, in $linenum\($[linenum-llinenum]\) lines
+    local src2=`getversionsource $2`
+    local ln2=$(getlinenum $src2)
+    local bn2=$(getbytenum $src2)
+
+    local name1=
+    local name2=
+
+    local lpp="$ln2"
+    local bpp="$bn2"
+
+    case $1 in
+      $VERSION ) name1="current src" ;;
+      $[VERSION-1] ) name1="latest src" ;;
+      * ) name1="src ver.$1" ;;
+    esac
+    case $2 in
+      $VERSION ) name2="current src" ;;
+      $[VERSION-1] ) name2="latest src" ;;
+      * ) name2="src ver.$2" ;;
+    esac
+
+    if [[ $[ln2-ln1] -gt 0 ]]; then
+      lpp+="(+"$[ln2-ln1]")"
+    elif [[ $[ln2-ln1] -lt 0 ]]; then
+      lpp+="("$[ln2-ln1]")"
+    fi
+    if [[ $[bn2-bn1] -gt 0 ]]; then
+      bpp+="(+"$[bn2-bn1]")"
+    elif [[ $[bn2-bn1] -lt 0 ]]; then
+      bpp+="("$[bn2-bn1]")"
+    fi
+
+    echo $name2 is $lpp bytes, $bpp lines by $name1
   fi
 }
 
-# argument: version number to compare
 function b_autostat {
-  argn 1
+  # no argument checking, it's not fixed
+  # argn 3
 
   if ! b_interactive_vertifysrc; then return 1; fi
 
-  # default latest vs. current
-  # only supports comparing with current version.
-  # sd st 0 4 -> this should be supported
-  if ! [[ "$1" =~ [1-9][0-9]* ]]; then
+  local src1=
+  local src2=
+
+  # null string arguments would not be counted
+  case $# in
+    0 ) src1=$[VERSION-1]; src2=$VERSION ;;
+    1 ) src1=$1; src2=$VERSION ;;
+    2 ) src1=$1; src2=$2 ;;
+    # using argn instead of assertion
+    * ) echo assert; argn 2 ;;
+  esac
+
+  if ! [[ "$src1" =~ [1-9][0-9]*|^0$ ]]; then
     echo please specify the version number
-    echo try \"sd st 0\" to compare current source with initial version
-  elif ! [[ 0 -le $1 ]] && [[ $1 -le $VERSION ]]; then
-    echo specify currect version in range 0 ~ $VERSION
+    echo \"$src1\" is not recognized as version number
+  elif ! [[ "$src2" =~ [1-9][0-9]*|^0$ ]]; then
+    echo please specify the version number
+    echo \"$src2\" is not recognized as version number
+  elif ! [[ 0 -le $src1 ]] || ! [[ $src1 -le $VERSION ]]; then
+    echo \"$src1\" is not int the valid range
+    echo "specify currect version in range [0, $VERSION]"
+  elif ! [[ 0 -le $src2 ]] || ! [[ $src2 -le $VERSION ]]; then
+    echo \"$src2\" is not int the valid range
+    echo "specify currect version in range [0, $VERSION]"
   else
-    showstat $1
+    showstat $src1 $src2
   fi
 
   return 0
