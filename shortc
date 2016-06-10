@@ -152,7 +152,13 @@ function b_autostat {
 
   # null string arguments would not be counted
   case $# in
-    0 ) src1=$[VERSION-1]; src2=$VERSION ;;
+    0 ) if [ $VERSION == 0 ]; then
+          # showstat would understand same value of src1 and src2
+          # as request to show status of the source
+          src1=$VERSION; src2=$VERSION
+        else
+          src1=$[VERSION-1]; src2=$VERSION
+        fi ;;
     1 ) src1=$1; src2=$VERSION ;;
     2 ) src1=$1; src2=$2 ;;
     # using argn instead of assertion
@@ -179,37 +185,69 @@ function b_autostat {
 }
 
 function showdiff {
-  argn 1
+  argn 2
 
-  if ! b_interactive_vertifysrc; then return 1; fi
+  local src1=`getversionsource $1`
+  local src2=`getversionsource $2`
 
-  local cmpver=$1
-  local cmpsrc=$WKDIR/versions/`getversionsource $cmpver`
+  local name1=
+  local name2=
 
-  echo diff ver. $cmpver / $VERSION\(current\)
-  sdiff $cmpsrc $SOURCENAME
-  l1=$(getlinenum $cmpsrc) #inte
-  b1=$(getbytenum $cmpsrc) #inte
-  l2=$(getlinenum $SOURCENAME) #inte
-  b2=$(getbytenum $SOURCENAME) #inte
-  echo $l2\($[l2-l1]\) lines, $b2\($[b2-b1]\) bytes
+  case $1 in
+    $VERSION ) name1="current src" ;;
+    $[VERSION-1] ) name1="latest src" ;;
+    * ) name1="src ver.$1" ;;
+  esac
+  case $2 in
+    $VERSION ) name2="current src" ;;
+    $[VERSION-1] ) name2="latest src" ;;
+    * ) name2="src ver.$2" ;;
+  esac
+
+  # outline format is fixed to sdiff default
+  printf "%-62s| %-62s\n" "$name1" "$name2"
+  echo ============================================================================================================================
+  sdiff $src1 $src2
 }
 
 function b_autodiff {
-  argn 1
+  # no argument checking, it's not fixed
+  # argn 3
 
-  if ! [[ "$1" =~ [1-9][0-9]* ]]; then
+  if ! b_interactive_vertifysrc; then return 1; fi
+
+  local src1=
+  local src2=
+
+  # null string arguments would not be counted
+  case $# in
+    0 ) if [ $VERSION == 0 ]; then
+          echo "you are on initial version, nothing to compare with"
+          return 1
+        else
+          src1=$[VERSION-1]; src2=$VERSION
+        fi ;;
+    1 ) src1=$1; src2=$VERSION ;;
+    2 ) src1=$1; src2=$2 ;;
+    # using argn instead of assertion
+    * ) echo assert; argn 2 ;;
+  esac
+
+  if ! [[ "$src1" =~ [1-9][0-9]*|^0$ ]]; then
     echo please specify the version number
-    echo try \"sd st 0\" to compare current source with initial version
-  elif ! [ 0 -le $1 -a $1 -le $VERSION ]; then
-    echo specify currect version in range 0 ~ $VERSION
+    echo \"$src1\" is not recognized as version number
+  elif ! [[ "$src2" =~ [1-9][0-9]*|^0$ ]]; then
+    echo please specify the version number
+    echo \"$src2\" is not recognized as version number
+  elif ! [[ 0 -le $src1 ]] || ! [[ $src1 -le $VERSION ]]; then
+    echo \"$src1\" is not int the valid range
+    echo "specify currect version in range [0, $VERSION]"
+  elif ! [[ 0 -le $src2 ]] || ! [[ $src2 -le $VERSION ]]; then
+    echo \"$src2\" is not int the valid range
+    echo "specify currect version in range [0, $VERSION]"
   else
-    showdiff $1
+    showdiff $src1 $src2
   fi
-
-  # default: latest vs. current
-  # one specified: $1 vs. current
-  # two specified: $1 vs. $2
 
   return 0
 }
