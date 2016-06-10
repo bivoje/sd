@@ -422,7 +422,7 @@ function b_autotesting {
     if ! b_autocompile; then return 1; fi
   fi
 
-  if [ -f "$TESTIONAME" ]; then
+  if ! [ -f "$TESTIONAME" ]; then
     echo no iofile yet..
     echo see iofile section of \"sd --help\"
   elif ! v_settestios; then

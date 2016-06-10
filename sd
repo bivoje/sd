@@ -118,7 +118,9 @@ case $1 in
   "remove") b_interactive_remove; exit ;;
 esac
 
-b_interactive_load
+if ! b_interactive_load; then
+  exit 1
+fi
 
 case $1 in
 
