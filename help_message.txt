@@ -1,5 +1,7 @@
 usage: sd <command> | sd --help
 
+COMMANDS =============================================================
+
 init | remove                                  :before integrity check
   -init
   inititialize sd repository for current directory.
@@ -28,17 +30,38 @@ set <figname> <val> | get [<figname>..]               :topic configure
   show the settings in fig for specified <figname>s.
   if none specified, then prints out all figs.
 
-co | te                                      :with source of a version
+co | te | ve                                 :with source of a version
   -co
   compile with default command selected from extension of src.
   -te
   test with excutable with input-output set specified in IO files
+  -ve
+  prints out current version.
+
+ne | st [src1] [src2] | df [src1] [src2]     :with versions of sources
   -ne
   save current version of source code to achieve,
   then update version number
+  -st
+  show status (lines, characters) of specified source file, compared
+  with other. - provided focused on short coding traning.
+    st - current status compared with the latest (right before of it)
+    st <src1> - status of src1 compared with right before
+    st <src1> <src2> - status of src2 compared with src1
+  -df
+  show diff of specified source file, compared with other.
+    df - diff between current and the latest (right before of it)
+    df <src1> - diff between src1 and right before
+    df <src1> <src2> - diff between src1 and src2
 
 help | --help                          :when you don't know what to do
   print this manual
 
+
+CONCEPTS =============================================================
+
   fig - what is it (get it from set), topic independent
   iofile - how to use
+  version - it is provided for short coding practice
+            iofile not changing recommanded but supported
+            not changing extensiong recommanded but supporte
