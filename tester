@@ -250,39 +250,6 @@ function v_settestios { # testioname
   fi
 }
 
-function mydiff {
-  argn 3
-
-  local width=$1
-  local ll1=$2
-  local ll2=$3
-
-  success=0
-
-  while [ -n "$ll1" -o -n "$ll2" ]; do
-    l1=${ll1%%\\n*}
-    ll1=${ll1#*\\n}
-    l2=${ll2%%\\n*}
-    ll2=${ll2#*\\n}
-
-    if [ "$l1" != "$l2" ]; then
-      printf "%-$[width]s" "$l1"
-      echo -n '| '
-      echo $l2
-      success=1
-    else
-      printf "%-$[width+2]s" "$l1"
-      echo $l2
-    fi
-
-    [ "$ll1" == "$l1" ] && ll1=""
-    [ "$ll2" == "$l2" ] && ll2=""
-
-  done
-
-  return $success
-}
-
 #======================================================================
 # user-interaction
 
@@ -354,13 +321,14 @@ function b_testing { # [auto]compile, settestios
   local clmwidth=20
 
   for i in `seq 0 $[TESTIONUM-1]`; do
-    testos="`echo -e ${TESTIS[$i]} | ./$EXECNAME`"
+    echo -e ${TESTIS[$i]} | ./$EXECNAME > $WKDIR/testos1
+    echo -e ${TESTOS[$i]} > $WKDIR/testos2
 
-    diferr=`mydiff $clmwidth "${TESTOS[$i]}" "$testos"`
+    sdiff $WKDIR/testos1 $WKDIR/testos2 > $WKDIR/diffs
 
     if [ $? != 0 ]; then
       echo === ERROR for input $[i+1] !!
-      echo "$diferr"
+      cat $WKDIR/diffs
       return 1
     fi
   done
