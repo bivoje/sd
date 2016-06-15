@@ -25,6 +25,8 @@ set <figname> <val> | get [<figname>..]               :topic configure
     SOURCENAME - source file name
     EXECNAME   - excuted file name
     TESTIONAME - IO file name
+    COMPNTEST  - if "yes", automatically compiles when testing
+               - this default, turn off by "sd set COMPNTEST no"
 
   -get
   show the settings in fig for specified <figname>s.

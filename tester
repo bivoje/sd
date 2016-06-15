@@ -273,6 +273,7 @@ function b_init_tester {
     read ans
     if [[ "$ans" =~ [yY].* ]]; then
       set_fig SOURCENAME $srccnds
+      set_fig COMPNTEST "yes"
     fi
   fi
 
@@ -339,12 +340,22 @@ function b_testing { # [auto]compile, settestios
 function b_autotesting {
   argn 0
 
-  if ! [ -x $EXECNAME ]; then
-    echo no excutable found named \"$EXECNAME\"
-    echo -n "may i compile it for you? (Yes, please \ No thanks) "
-    read ans
-    if ! [[ $ans =~ [yY].* ]]; then return 1; fi
-    if ! b_autocompile; then return 1; fi
+  if [ "$COMPNTEST" == "yes" ]; then
+    # always compile before testing
+    if b_autocompile; then return 1; fi
+  else
+    # do not automatically compile before testing
+    # compile only when there's no excutable
+    if ! b_interactive_vertifysrc; then return 1; fi
+    if ! [ -x $EXECNAME ]; then
+      echo no excutable found named \"$EXECNAME\"
+      read -p "may i compile it for you? (Yes, please \ No thanks) " a
+      if ! [[ $a =~ [yY].* ]]; then
+        echo "it's not y or Y! i'll get that as No"
+        return 1;
+      fi
+      if ! b_autocompile; then return 1; fi
+    fi
   fi
 
   if ! [ -f "$TESTIONAME" ]; then
