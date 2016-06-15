@@ -93,8 +93,6 @@ function b_interactive_load {
         echo if you want to start, \"sd init\" ;;
     2 ) echo sd repository damaged..  you need to rebuild whole
         echo using \"sd remove\" and \"sd init\" ;;
-    3 ) echo yousr source file extension unrecognizable!
-        echo "re-set manually by \"sd set SOURCENAME <srcname>\"" ;;
 
     # shortc error parsing
     11 ) echo WKDIR/versions damaged

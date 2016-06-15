@@ -331,20 +331,12 @@ function v_load_tester {
     EXECNAME=`echo $SOURCENAME | sed "s/^\(.\+\)\.[a-z]\+$/\1/"`
   fi
 
-  # if variable not set yet
-  if [ -z "$CMDLCMD" ]; then
-    local ext=`getextension $SOURCENAME`
-    CMPLCMD=`getcmplcmdfromext $ext`
-    if [ -z "$CMPLCMD" ]; then return 3; fi
-  fi
-
   TESTIONAME=${TESTIONAME:-iofile}
 
   return 0
   # 0 = success, all works fine!
   # 1 = no WKDIR found
   # 2 = required structure of WKDIR damaged
-  # 3 = unrecognizable source file extension.
 }
 
 function b_compile { # wkdir, cmplcmd
@@ -419,6 +411,15 @@ function b_autocompile { # src/exec name
     done
 
   elif [ $CMPLNEED != 0 ]; then
+    if [ -z "$CMDLCMD" ]; then
+      local ext=`getextension $SOURCENAME`
+      CMPLCMD=`getcmplcmdfromext $ext`
+      if [ -z "$CMPLCMD" ]; then
+        echo extension of your source file is unrecognizable!
+        echo "re-set manually by \"sd set SOURCENAME <srcname>\""
+        return 1
+      fi
+    fi
     b_compile
     return $?
   fi
