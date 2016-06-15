@@ -1,7 +1,12 @@
 #!/bin/bash
 
+# shortc module for sd
 # exporting variables
-# { VERSION
+# {
+#   VERSION
+#   WKDIR
+#     /versions
+#     version
 # }
 
 . tester

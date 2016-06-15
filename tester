@@ -1,35 +1,9 @@
 #!/bin/bash
 
-# this is a tester module for sd
-
-# conventions
-# names  | denotes functions which
-# -------|--------------------------
-# get..    echos value to stdout
-# set..    set the global variable
-# [x]_..   returns meaningful value
-#  x=b      boolean success
-#  x=v      result value
-# __..     used for macros
-# else     user-interaction routines.
-#   auto..   frontend routines.
-
-# debug utilities..
-# argn     function - which actually alias -
-#          checks proper number of argument was given
-
+# tester module for sd
 # exporting variables
-# { SOURCENAME
-# , EXECNAME
-# , TESTIONAME
-# , CMPLNEED
-#     0 doesn't needed
-#     1 exec not exist
-#     2 src modified
-#     3 exec has created manually
-# , TESTIS
-# , TESTOS
-# , WKDIR -- guarantee following structure
+# {
+#   WKDIR
 #     /snap
 #     fig
 # }
@@ -159,6 +133,11 @@ function setcmplneed { # wkdir, src,exec name
       fi
     fi
   fi
+
+# CMPLNEED = 0 doesn't needed
+#            1 exec not exist
+#            2 src modified
+#            3 exec has created manually
 }
 
 function checktestios {
