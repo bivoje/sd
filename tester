@@ -17,9 +17,6 @@
 # debug utilities..
 # argn     function - which actually alias -
 #          checks proper number of argument was given
-# assert   same as ASSERT macro in C language
-#          mute on un-debugging not supported
-#          use with string of statement to evaluate
 
 # exporting variables
 # { SOURCENAME
@@ -39,7 +36,6 @@
 
 shopt -s expand_aliases
 alias argn='__argn $0 $LINENO $#'
-alias assert='__assert $0 $LINENO'
 
 WKDIR=.sd
 
@@ -50,23 +46,13 @@ function __argn {
       echo Too little arguments
     else echo Too many arguments; fi
     exit
+  elif ! [[ "$4" =~ ^[0-9]+$ ]] ; then
+    echo ERROR of \"$4\"
+    echo on $2 th line of \"$1\"
+    exit
   elif [ $3 != $4 ]; then
     echo ARGERROR! on $2 th line of \"$1\"
     echo required $4 but given $3
-    exit
-  fi
-}
-
-function __assert {
-  if [ $# != 3 ]; then
-    echo ASSERTERROR! on $2 th line of \"$1\"
-    if [ $# == 2 ]; then
-      echo Too little arguments
-    else echo Too many arguments; fi
-    exit
-  elif ! [ $3 ]; then
-    echo ASSERTION FAILED! on $2 th line of \"$1\"
-    echo of assertion \"$3\"
     exit
   fi
 }

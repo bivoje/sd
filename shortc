@@ -25,8 +25,7 @@ function getbytenum {
 function getversionsource {
   argn 1
 
-  # using argn instead of assertion
-  if ! [[ "$1" =~ [1-9][0-9]*|^0$ ]]; then echo assert; argn 0; fi
+  if ! [[ "$1" =~ [1-9][0-9]*|^0$ ]]; then argn "not a nubmer"; fi
 
   if [ $1 == $VERSION ]; then
     echo $SOURCENAME
@@ -167,8 +166,7 @@ function b_autostat {
           src2=$1; src1=$[src2-1]
         fi ;;
     2 ) src1=$1; src2=$2 ;;
-    # using argn instead of assertion
-    * ) echo assert; argn 2 ;;
+    * ) argn "no rule for $# number of arguments" ;;
   esac
 
   if ! [[ "$src1" =~ [1-9][0-9]*|^0$ ]]; then
@@ -240,8 +238,7 @@ function b_autodiff {
           src2=$1; src1=$[src2-1]
         fi;;
     2 ) src1=$1; src2=$2 ;;
-    # using argn instead of assertion
-    * ) echo assert; argn 2 ;;
+    * ) argn "no rule for $# number of arguments" ;;
   esac
 
   if ! [[ "$src1" =~ [1-9][0-9]*|^0$ ]]; then
