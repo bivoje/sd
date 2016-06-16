@@ -93,27 +93,18 @@ function setsrcexecnamei {
   EXECNAME=${EXECNAME:-main}
 }
 
-function getcmplcmdfromext {
+function setcmplcmdfromext {
   argn 1
 
-  local cmplcmd=
   local ext=$1
-  local map=(
-    "c   gcc $SOURCENAME -o $EXECNAME"
-    "cpp g++ $SOURCENAME -o $EXECNAME"
-    "hs  ghc $SOURCENAME -o $EXECNAME"
-    "lhs ghc $SOURCENAME -o $EXECNAME"
-    "sh  cp $SOURCENAME $EXECNAME && chmod u+x $EXECNAME"
-    )
 
-  for val in "${map[@]}"; do
-    if [ `echo $val | cut -s -d ' ' -f 1` == $ext ]; then
-      cmplcmd=`expr "$val" : "$ext[[:blank:]]\+\(.*\)"`
-      break
-    fi
-  done
-
-  echo $cmplcmd
+  case $1 in
+    c   ) CMPLCMD=(gcc "$SOURCENAME" -o "$EXECNAME") ;;
+    cpp ) CMPLCMD=(g++ "$SOURCENAME" -o "$EXECNAME") ;;
+    hs  ) CMPLCMD=(ghc "$SOURCENAME" -o "$EXECNAME") ;;
+    lhs ) CMPLCMD=(ghc "$SOURCENAME" -o "$EXECNAME") ;;
+    sh  ) CMPLCMD=(cp "$SOURCENAME" "$EXECNAME" \&\& chmod u+x "$EXECNAME") ;;
+  esac
 }
 
 function setcmplneed {
@@ -310,8 +301,8 @@ function v_load_tester {
 function b_compile {
   argn 0
 
-  echo $CMPLCMD
-  $CMPLCMD && upmodstate $EXECNAME && upmodstate $SOURCENAME
+  echo "${CMPLCMD[@]}"
+  "${CMPLCMD[@]}" && upmodstate "$EXECNAME" && upmodstate "$SOURCENAME"
   return $?
 }
 
@@ -392,8 +383,8 @@ function b_autocompile {
   elif [ $CMPLNEED != 0 ]; then
     if [ -z "$CMDLCMD" ]; then
       local ext=`getextension "$SOURCENAME"`
-      CMPLCMD=`getcmplcmdfromext $ext`
-      if [ -z "$CMPLCMD" ]; then
+      setcmplcmdfromext $ext
+      if [ -z "${CMPLCMD}" ]; then
         echo extension of your source file is unrecognizable!
         echo "re-set manually by \"sd set SOURCENAME <srcname>\""
         return 1
