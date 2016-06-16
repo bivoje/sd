@@ -22,11 +22,20 @@ set <figname> <val> | get [<figname>..]               :topic configure
   so, setting ANY variable is possible to adjust operation of sd.
   though some variables would be overwritten by loading modules.
   these are verified variables that you can set (sd will not overwrite)
-    SOURCENAME - source file name
-    EXECNAME   - excuted file name
-    TESTIONAME - IO file name
-    COMPNTEST  - if "yes", automatically compiles when testing
-               - this default, turn off by "sd set COMPNTEST no"
+    source - source file name
+    execute- excuted file name
+    iofile - IO file name
+    cmpntst- if "on", automatically compiles when testing
+           - this is default, turn off by "sd cmpnte off"
+    cmplcmd- compile command used to compile the source
+      the name of sourcefile to be compiled, and that of excutable
+      should be same with the sd's ones.
+        if you set 'source' and 'execute' then they should be identical.
+        if 'excute' not set, excutable name should be source without extension
+        if both not set, default is 'main.c' and 'main'
+      if its complicated that just adding option, use make
+        or sd set cmplcmd 'gcc -c "$SOURCENAME" -o "$EXECNAME" -Wall'
+        or simply (sd set cmplcmd make) with appropriate makefile
 
   -get
   show the settings in fig for specified <figname>s.
