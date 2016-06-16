@@ -34,8 +34,8 @@ function get_vars {
 
   while read line; do
     varname=`echo $line | cut -d= -f1`
-    varvalue=`expr $line : "varname=\(.*\)$"`
-    echo $varname = \"$varvalue\"
+    varvalue=`expr "$line" : "$varname=\(.*\)$"`
+    echo $varname = $varvalue
   done < $WKDIR/fig
 }
 
