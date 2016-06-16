@@ -3,6 +3,9 @@
 # tester module for sd
 # exporting variables
 # {
+#   SOURCENAME
+#   EXECNAME
+#   TESTIONAME
 #   WKDIR
 #     /snap
 #     fig
@@ -37,10 +40,10 @@ function set_fig {
   local num=`grep $WKDIR/fig -e "^$1=" -c`
 
   if [ $num == 1 ]; then
-    sed "s/^$1=.*$/$1=\"$2\"/" $WKDIR/fig > $WKDIR/fig.m
+    sed "s/^$1=.*$/$1=$2/" $WKDIR/fig > $WKDIR/fig.m
     mv $WKDIR/fig.m $WKDIR/fig
   elif [ $num == 0 ]; then
-    echo "$1=\"$2\"" >> $WKDIR/fig
+    echo "$1=$2" >> $WKDIR/fig
   else
     echo duplicated fig \"$1\" apeared!
   fi
@@ -381,7 +384,7 @@ function b_autocompile {
     done
 
   elif [ $CMPLNEED != 0 ]; then
-    if [ -z "$CMDLCMD" ]; then
+    if [ -z "$CMPLCMD" ]; then
       local ext=`getextension "$SOURCENAME"`
       setcmplcmdfromext $ext
       if [ -z "${CMPLCMD}" ]; then

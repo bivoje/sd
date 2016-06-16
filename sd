@@ -24,9 +24,9 @@ function b_set_var {
   argn 2
 
   case $1 in
-    "source" ) set_fig SOURCENAME "$2" ;;
-    "execute") set_fig EXECNAME "$2" ;;
-    "iofile" ) set_fig TESTIONAME "$2" ;;
+    "source" ) set_fig SOURCENAME "\"$2\"" ;;
+    "execute") set_fig EXECNAME "\"$2\"" ;;
+    "iofile" ) set_fig TESTIONAME "\"$2\"" ;;
     "cmpntst")
       if [ "$2" == "on" ]; then
         set_fig COMPNTEST "on"
@@ -37,6 +37,7 @@ function b_set_var {
         set_fig COMPNTEST "off"
       fi
       ;;
+    "cmplcmd" ) set_fig CMPLCMD \("$2"\);;
     * )
       echo unrecognizable setting option!
       echo read manual to figure out what you can set
