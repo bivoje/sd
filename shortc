@@ -19,12 +19,12 @@ function updateversion {
 
 function getlinenum {
   argn 1
-  wc -l $1 | cut -f1 -d " "
+  wc -l "$1" | cut -f1 -d " "
 }
 
 function getbytenum {
   argn 1
-  wc -c $1 | cut -f1 -d " "
+  wc -c "$1" | cut -f1 -d " "
 }
 
 function getversionsource {
@@ -76,8 +76,8 @@ function v_load_shortc {
 function nextversion {
   argn 0
 
-  local ext=`getextension $SOURCENAME`
-  cp $SOURCENAME $WKDIR/versions/$VERSION.$ext
+  local ext=`getextension "$SOURCENAME"`
+  cp "$SOURCENAME" $WKDIR/versions/$VERSION.$ext
   ((VERSION++))
 
   updateversion $VERSION
@@ -98,9 +98,9 @@ function b_autonextversion {
 function showstat {
   argn 2
 
-  local src1=`getversionsource $1`
-  local ln1=$(getlinenum $src1)
-  local bn1=$(getbytenum $src1)
+  local src1="`getversionsource $1`"
+  local ln1=$(getlinenum "$src1")
+  local bn1=$(getbytenum "$src1")
 
   if [ $1 == $2 ]; then
     if [ $1 == $VERSION ]; then
@@ -109,9 +109,9 @@ function showstat {
       echo source ver.$1 is $bytes bytes, $lines lines
     fi
   else
-    local src2=`getversionsource $2`
-    local ln2=$(getlinenum $src2)
-    local bn2=$(getbytenum $src2)
+    local src2="`getversionsource $2`"
+    local ln2=$(getlinenum "$src2")
+    local bn2=$(getbytenum "$src2")
 
     local name1=
     local name2=
@@ -196,8 +196,8 @@ function b_autostat {
 function showdiff {
   argn 2
 
-  local src1=`getversionsource $1`
-  local src2=`getversionsource $2`
+  local src1="`getversionsource $1`"
+  local src2="`getversionsource $2`"
 
   local name1=
   local name2=
@@ -216,7 +216,7 @@ function showdiff {
   # outline format is fixed to sdiff default
   printf "%-62s| %-62s\n" "$name1" "$name2"
   echo ============================================================================================================================
-  sdiff $src1 $src2
+  sdiff "$src1" "$src2"
 }
 
 function b_autodiff {
