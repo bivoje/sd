@@ -31,7 +31,7 @@ function __argn {
   fi
 }
 
-function set_fig { # wkdir
+function set_fig {
   argn 2
 
   local num=`grep $WKDIR/fig -e "^$1=" -c`
@@ -46,12 +46,12 @@ function set_fig { # wkdir
   fi
 }
 
-function get_fig { # wkdir
+function get_fig {
   local line=`grep $WKDIR/fig -e "^$1"`
   expr "$line" : "^$1=\(.*\)$"
 }
 
-function b_ismodified { # wkdir
+function b_ismodified {
   argn 1
 
   # diff will return 2 if there's no such file
@@ -59,7 +59,7 @@ function b_ismodified { # wkdir
   return $?
 }
 
-function upmodstate { # wkdir
+function upmodstate {
   argn 1
 
   cp "$1" $WKDIR/snap/"$1"
@@ -116,7 +116,7 @@ function getcmplcmdfromext {
   echo $cmplcmd
 }
 
-function setcmplneed { # wkdir, src,exec name
+function setcmplneed {
   argn 0
 
   if ! [ -x "$EXECNAME" ]; then
@@ -151,7 +151,7 @@ function checktestios {
   echo done! =================
 }
 
-function v_settestios { # testioname
+function v_settestios {
   argn 0
 
   local wheio=0 # parsing on input(-1), comment(0), output(1)
@@ -307,7 +307,7 @@ function v_load_tester {
   # 2 = required structure of WKDIR damaged
 }
 
-function b_compile { # wkdir, cmplcmd
+function b_compile {
   argn 0
 
   echo $CMPLCMD
@@ -315,7 +315,7 @@ function b_compile { # wkdir, cmplcmd
   return $?
 }
 
-function b_testing { # [auto]compile, settestios
+function b_testing {
   argn 0
 
   local testos=
@@ -371,7 +371,7 @@ function b_autotesting {
   return 1
 }
 
-function b_autocompile { # src/exec name
+function b_autocompile {
   argn 0
 
   if ! b_interactive_vertifysrc; then return 1; fi
