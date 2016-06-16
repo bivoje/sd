@@ -20,10 +20,30 @@ function __b_argn {
   return 0
 }
 
-function set_var {
+function b_set_var {
   argn 2
 
-  set_fig $1 "$2"
+  case $1 in
+    "source" ) set_fig SOURCENAME "$2" ;;
+    "execute") set_fig EXECNAME "$2" ;;
+    "iofile" ) set_fig TESTIONAME "$2" ;;
+    "cmpntst")
+      if [ "$2" == "on" ]; then
+        set_fig COMPNTEST "on"
+      else
+        if [ "$2" != "off" ]; then
+          echo expected either on/off, i will consiter this as off
+        fi
+        set_fig COMPNTEST "off"
+      fi
+      ;;
+    * )
+      echo unrecognizable setting option!
+      echo read manual to figure out what you can set
+      return 1 ;;
+  esac
+
+  return 0
 }
 
 function get_vars {
@@ -131,7 +151,7 @@ case $1 in
   "st" ) b_autostat $2 $3 ;;
   "df" ) b_autodiff $2 $3 ;;
 
-  "set") b_argn 3 && set_var $2 "$3" ;;
+  "set") b_argn 3 && b_set_var $2 "$3" ;;
   "get") if [ $# == 1 ]; then get_vars;
          else for i in `seq 2 $#`; do echo ${!i} = `get_fig ${!i}`; done
          fi ;;
