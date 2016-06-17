@@ -248,20 +248,26 @@ function b_init_tester {
     return 1
   fi
 
-  if ! mkdir $WKDIR; then return 2; fi
+  if ! mkdir $WKDIR; then
+    echo could not make repository, maybe there is file named \"$WKDIR\"
+    return 1
+  fi
   touch $WKDIR/fig
   mkdir $WKDIR/snap
 
-  srccnds=`ls | grep ".\+\.[a-z]\+$"`
-  if [ 1 == `echo $srccnds | wc -l` ]; then
+  if [ 1 == `ls | grep ".\+\.[a-z]\+$" | wc -l` ]; then
     echo it seems you have only one file in this directory.
+    srccnds=`ls | grep ".\+\.[a-z]\+$"`
     echo -n "do you want to start with \"$srccnds\"? (y/n) "
     read ans
     if [[ "$ans" =~ [yY].* ]]; then
       set_fig SOURCENAME $srccnds
-      set_fig COMPNTEST "yes"
+    else
+      echo take it as no
     fi
   fi
+
+  set_fig COMPNTEST "yes"
 
   return 0;
 }
