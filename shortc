@@ -48,7 +48,7 @@ function b_init_shortc {
 
   updateversion 0
 
-  return 0;
+  return 0
 }
 
 function v_load_shortc {

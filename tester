@@ -74,7 +74,7 @@ function b_interactive_vertifysrc {
   if ! [ -f "$SOURCENAME" ]; then
     echo "can't find source file \"$SOURCENAME\""
     echo "re-set the correct source name manually"
-    echo "using command \"sd set SOURCENAME <sourcename>\""
+    echo "using command \"sd set source <sourcename>\""
     return 1
   else
     return 0
@@ -86,14 +86,6 @@ function getextension {
   argn 1
 
   echo $1 | rev | cut -s -d '.' -f 1 | rev
-}
-
-function setsrcexecnamei {
-  argn 0
-
-  # if variable already not set
-  SOURCENAME=${SOURCENAME:-main.c}
-  EXECNAME=${EXECNAME:-main}
 }
 
 function setcmplcmdfromext {
@@ -336,7 +328,7 @@ function b_autotesting {
 
   if [ "$COMPNTEST" == "yes" ]; then
     # always compile before testing
-    if b_autocompile; then return 1; fi
+    if ! b_autocompile; then return 1; fi
   else
     # do not automatically compile before testing
     # compile only when there's no excutable
@@ -389,7 +381,7 @@ function b_autocompile {
       setcmplcmdfromext $ext
       if [ -z "${CMPLCMD}" ]; then
         echo extension of your source file is unrecognizable!
-        echo "re-set manually by \"sd set SOURCENAME <srcname>\""
+        echo "re-set manually by \"sd set source <srcname>\""
         return 1
       fi
     fi
