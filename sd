@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # main module of sd
-. shortc
+. achieve
 
 alias b_argn='__b_argn $#'
 
@@ -67,7 +67,7 @@ function help_message {
 function b_interactive_init {
   argn 0
 
-  if b_init_shortc; then return 0; fi
+  if b_init_achieve; then return 0; fi
 
   echo initializing halted
   rm -rf $WKDIR &> /dev/null
@@ -102,7 +102,7 @@ function b_interactive_remove {
 function b_interactive_load {
   argn 0
 
-  v_load_shortc
+  v_load_achieve
   local re=$?
 
   case $re in
@@ -156,6 +156,8 @@ case $1 in
   "get") if [ $# == 1 ]; then get_vars;
          else for i in `seq 2 $#`; do echo ${!i} = `get_fig ${!i}`; done
          fi ;;
+
+  "arch") b_autoachieve "$2" "$3" ;;
 
   "help") help_message ;;
   "--help") help_message ;;

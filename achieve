@@ -1,0 +1,81 @@
+#!bin/bash
+
+#
+# {
+#   WKDIR
+#     \achievce
+# }
+
+. shortc
+
+function b_init_achieve {
+  argn 0
+
+  if ! b_init_shortc; then return 1; fi
+
+  mkdir $WKDIR/achieves
+  return $?
+}
+
+function v_load_achieve {
+  argn 0
+
+  v_load_shortc
+  return $?
+}
+
+# argument : achieve name
+function achieve {
+  argn 1
+
+  mkdir $WKDIR/achieves/"$1"
+
+  # achieve versions
+  mv $WKDIR/version $WKDIR/versions $WKDIR/achieves/"$1"
+  mkdir $WKDIR/versions
+  updateversion 0
+
+  # achieve iofile
+  if [ -f "$TESTIONAME" ]; then
+    cp "$TESTIONAME" $WKDIR/achieves/"$1"/iofile
+  fi
+
+  # achieve fig
+  cp $WKDIR/fig $WKDIR/achieves/"$1"
+
+  # reset snap
+  rm -r $WKDIR/snap && mkdir $WKDIR/snap
+
+}
+
+function b_autoachieve {
+
+  if [ 0 == $VERSION ]; then #inte
+    echo you\'ve done nothing!
+    return 1
+  fi
+
+  if [ -n "$2" ]; then
+    echo need you to specify a name for achieve!
+    return 1
+  fi
+
+  local name=
+
+  if [ -z "$1" ]; then
+    read -p "achieve name : " ans
+    if [[ "$ans" =~ ^[[:blank:]]*$ ]]; then
+      echo take it as canceling
+      return 1
+    else name="$ans"; fi
+  else name="$1"; fi
+
+  if [ -d "$WKDIR/achieves/$name" ]; then
+    echo achieve named \"$name\" already exist!
+    echo choose another name
+    return 1
+  fi
+
+  achieve $name
+  return 0
+}
