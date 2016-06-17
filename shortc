@@ -259,3 +259,35 @@ function b_autodiff {
 
   return 0
 }
+
+function resetversion {
+  argn 1
+
+  local src="`getversionsource $1`"
+  cp "$src" "$SOURCENAME"
+
+}
+
+function b_autoreset {
+  argn 2
+
+  local src=
+
+  if [ -n "$2" ]; then
+    echo need a version number to take
+    echo you specified too many arguments
+    return 1
+  fi
+
+  if [ -z "$1" ]; then
+    src=$[VERSION-1]
+  else
+    src="$1"
+  fi
+
+  if b_interactive_check_vnumber $src; then
+    resetversion $src
+  fi
+
+  return 0
+}

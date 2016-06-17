@@ -151,6 +151,7 @@ case $1 in
   "ne" ) b_argn 1 && b_autonextversion ;;
   "st" ) b_autostat $2 $3 ;;
   "df" ) b_autodiff $2 $3 ;;
+  "re" ) b_autoreset "$2" "$3" ;;
 
   "set") b_argn 3 && b_set_var $2 "$3" ;;
   "get") if [ $# == 1 ]; then get_vars;
