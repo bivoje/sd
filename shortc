@@ -27,6 +27,22 @@ function getbytenum {
   wc -c "$1" | cut -f1 -d " "
 }
 
+function b_interactive_check_vnumber {
+  argn 1
+
+  if ! [[ "$1" =~ [1-9][0-9]*|^0$ ]]; then
+    echo please specify the version number
+    echo \"$1\" is not recognized as version number
+  elif ! [[ 0 -le $1 ]] || ! [[ $1 -le $VERSION ]]; then
+    echo \"$1\" is not int the valid range
+    echo "specify currect version in range [0, $VERSION]"
+  else
+    return 0
+  fi
+
+  return 1
+}
+
 function getversionsource {
   argn 1
 
@@ -174,19 +190,8 @@ function b_autostat {
     * ) argn "no rule for $# number of arguments" ;;
   esac
 
-  if ! [[ "$src1" =~ [1-9][0-9]*|^0$ ]]; then
-    echo please specify the version number
-    echo \"$src1\" is not recognized as version number
-  elif ! [[ "$src2" =~ [1-9][0-9]*|^0$ ]]; then
-    echo please specify the version number
-    echo \"$src2\" is not recognized as version number
-  elif ! [[ 0 -le $src1 ]] || ! [[ $src1 -le $VERSION ]]; then
-    echo \"$src1\" is not int the valid range
-    echo "specify currect version in range [0, $VERSION]"
-  elif ! [[ 0 -le $src2 ]] || ! [[ $src2 -le $VERSION ]]; then
-    echo \"$src2\" is not int the valid range
-    echo "specify currect version in range [0, $VERSION]"
-  else
+  if b_interactive_check_vnumber $src1 &&
+     b_interactive_check_vnumber $src2; then
     showstat $src1 $src2
   fi
 
@@ -246,19 +251,9 @@ function b_autodiff {
     * ) argn "no rule for $# number of arguments" ;;
   esac
 
-  if ! [[ "$src1" =~ [1-9][0-9]*|^0$ ]]; then
-    echo please specify the version number
-    echo \"$src1\" is not recognized as version number
-  elif ! [[ "$src2" =~ [1-9][0-9]*|^0$ ]]; then
-    echo please specify the version number
-    echo \"$src2\" is not recognized as version number
-  elif ! [[ 0 -le $src1 ]] || ! [[ $src1 -le $VERSION ]]; then
-    echo \"$src1\" is not int the valid range
-    echo "specify currect version in range [0, $VERSION]"
-  elif ! [[ 0 -le $src2 ]] || ! [[ $src2 -le $VERSION ]]; then
-    echo \"$src2\" is not int the valid range
-    echo "specify currect version in range [0, $VERSION]"
-  else
+
+  if b_interactive_check_vnumber $src1 &&
+     b_interactive_check_vnumber $src2; then
     showdiff $src1 $src2
   fi
 
