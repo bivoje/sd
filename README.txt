@@ -1,3 +1,5 @@
+**this project is discontinued**
+
 # sd
 simple, light, bash scripts for testing or achieving codes
 
